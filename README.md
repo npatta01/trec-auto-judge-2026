@@ -1,6 +1,11 @@
-# Auto-Judge Starterkit
+# TREC AutoJudge 2026
 
-A forkable template repository with example Auto-Judge implementations for building custom judges.
+A research judge for document-grounded citation support, built on the TREC AutoJudge starter kit.
+
+The [document support workflow](docs/document-pipeline.md) checks cited claims,
+preserves provenance, and produces answer-level support proxies. It is not an
+official host-track metric or a validated replacement for human judgments.
+The organizer's setup and example documentation follows below.
 
 <p align="center">
    <img width=120px src="https://trec-auto-judge.cs.unh.edu/media/trec-auto-judge-logo-small.png">
