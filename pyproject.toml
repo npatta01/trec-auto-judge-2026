@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "auto-judge-starterkit"
+name = "trec-autojudge-2026"
 version = "1.0.0"
-description = "Example AutoJudge implementations for building custom judges"
+description = "TREC AutoJudge 2026 participant workspace"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-    {name = "TREC AutoJudge Team"}
+    {name = "npatta01"}
 ]
 keywords = ["trec", "autojudge", "rag", "evaluation", "ir"]
 classifiers = [
@@ -38,18 +38,19 @@ test = [
 ]
 minima-llm = [
     "minima-llm>=0.2.5",
+    "tiktoken>=0.14.0",
 ]
 evaluate = [
     "autojudge-evaluate>=1.0.0",
 ]
 all = [
-    "auto-judge-starterkit[minima-llm,evaluate,test]",
+    "trec-autojudge-2026[minima-llm,evaluate,test]",
     "tqdm>=4.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/trec-auto-judge/auto-judge-starter-kit"
-Repository = "https://github.com/trec-auto-judge/auto-judge-starter-kit"
+Homepage = "https://github.com/npatta01/trec-auto-judge-2026"
+Repository = "https://github.com/npatta01/trec-auto-judge-2026"
 
 [tool.setuptools.packages.find]
 where = ["."]
