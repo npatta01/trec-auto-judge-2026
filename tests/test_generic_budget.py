@@ -122,21 +122,6 @@ def test_schema_bytes_are_included_in_preflight_cost(tmp_path):
         asyncio.run(backend.generate(req))
 
 
-@pytest.mark.parametrize("topic_id", ["", "  "])
-def test_blank_topic_ids_are_rejected(topic_id):
-    from autojudge_base import Request
-    from judges.generic.judge import GenericJudge
-    from judges.generic.models import JudgeError
-    from tests.test_generic_judge import report
-
-    r = report(sentences=[])
-    r.metadata.topic_id = topic_id
-    with pytest.raises(JudgeError):
-        GenericJudge().judge(
-            [r], [Request(request_id=topic_id, title="")], SimpleNamespace(raw={})
-        )
-
-
 def test_budget_preserves_high_reasoning_and_stops_at_incremental_cap(tmp_path):
     from judges.generic.budget import BudgetBackend
     from judges.generic.models import JudgeError

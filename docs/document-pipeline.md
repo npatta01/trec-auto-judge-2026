@@ -1,12 +1,12 @@
 # Document-first citation support
 
-The selected workflow is `judges/generic/document-workflow.yml`. Install the
+The selected workflow is `judges/generic/workflow.yml`. Install the
 project's `minima-llm` and `test` extras. Configure the endpoint through the
 organizer's environment contract; the tested model is `openai/gpt-6-luna` with
 high reasoning. Never put credentials in commands or commit runtime artifacts.
 
 ```bash
-auto-judge run --workflow judges/generic/document-workflow.yml \
+auto-judge run --workflow judges/generic/workflow.yml \
   --rag-responses data/kiddie/runs/repgen/ \
   --rag-topics data/kiddie/topics/kiddie-topics.jsonl \
   --out-dir output/document-support-kiddie
@@ -62,11 +62,23 @@ The current implementation holds reports in memory and is not a streaming engine
 `document_pipeline.py` owns preparation, batching, judging, eligibility and answer
 summaries. `chunk_aggregation.py` owns strongest-chunk aggregation.
 `document_judge.py` adapts this to the framework. `budget.py` and `private_io.py`
-provide bounded spending and artifact handling. Shared client/model/normalization
-modules and the earlier generic workflow remain for compatibility and regression
-tests; they are not the selected document-stage scoring procedure.
+provide bounded spending and artifact handling. `client.py` constructs the injected
+endpoint; `models.py` defines strict validation and safe errors; `reports.py`
+normalizes citation formats. The older direct/staged judge and its scoring are
+not part of this implementation. Its code remains in Git history.
+
+The cleanup replaces `document-workflow.yml` with the standard `workflow.yml`,
+so the organizer's automatic workflow tests also exercise this judge. Use the
+command above rather than the earlier experimental workflow path.
 
 Run `python -m pytest -q`. Tests include synthetic labels, chunk coverage, failure
-handling, retention, per-invocation accounting and real CLI/loopback integration.
+handling, retention, per-invocation accounting, real CLI/loopback integration and
+offline cache replay from the loopback endpoint. Legacy-only tests were removed with the legacy code;
+normalization coverage was retained independently.
 The [v4 live check](v4-live-results.md) processed 80 real citation pairs for
 $0.020631725. This verifies a small workflow sample, not broad semantic accuracy.
+
+Known limitation: OpenRouter adds provider options to requests inside the budget
+adapter, while `OPENAI_BASE_URL=EMPTY` bypasses that adapter. Those options enter
+the cache key, so the loopback replay test does not establish offline replay of
+OpenRouter runs. Resolve this before relying on that reproducibility path.

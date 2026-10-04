@@ -1,37 +1,16 @@
-judge_class: "judges.generic.judge:GenericJudge"
+judge_class: "judges.generic.document_judge:DocumentJudge"
 create_nuggets: false
 create_qrels: false
 judge: true
+uses_llm: true
 settings:
-  filebase: "{_name}"
-  mode: staged
-  max_prompt_chars: 120000
-  max_answer_chars: 40000
-  document_chunk_chars: 12000
-  chunk_overlap: 256
-  max_tokens: 8192
-  schema_attempts: 2
-  structured_output: false
-  evidence_format: quotes
-variants:
-  staged:
-    mode: staged
-  direct:
-    mode: direct
-  staged_spans:
-    mode: staged
-    evidence_format: spans
-    structured_output: true
-    max_tokens: 4096
-  staged_spans_openrouter:
-    mode: staged
-    evidence_format: spans
-    structured_output: true
-    max_tokens: 4096
-    request_extra:
-      provider:
-        max_price: {prompt: 1, completion: 3, request: 0}
-        require_parameters: true
-        allow_fallbacks: false
-        data_collection: deny
-      reasoning: {enabled: false}
+  filebase: "document-support"
+  document_tokens: 24000
+  overlap_tokens: 256
+  context_tokens: 64000
+  output_tokens: 8192
+  safety_tokens: 2048
+  batch_size: 5
+  budget_ledger: output/budget20/budget.sqlite3
+  budget_cap_usd: 16.0
+  run_budget_usd: 0.50

@@ -1,1 +1,1 @@
-"""Generic request-aware, evidence-grounded AutoJudge."""
+"""Document-grounded citation support AutoJudge."""

@@ -1,6 +1,6 @@
 import asyncio
 import pytest
-from tests.test_generic_judge import report
+from tests.report_fixtures import report
 
 
 class Checker:

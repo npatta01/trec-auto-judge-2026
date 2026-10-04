@@ -2,7 +2,7 @@ import json
 from types import SimpleNamespace
 from minima_llm import MinimaLlmResponse
 from autojudge_base import Request
-from tests.test_generic_judge import report
+from tests.report_fixtures import report
 import pytest
 
 
@@ -91,7 +91,7 @@ def test_adapter_retains_exclusions_without_exporting_them(tmp_path):
     assert (tmp_path / "document.supported-claims.jsonl").read_text() == ""
 
 
-def test_document_cli_http_roundtrip(tmp_path):
+def test_document_cli_http_roundtrip_and_offline_replay(tmp_path):
     import subprocess, sys, os, threading
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -151,6 +151,7 @@ def test_document_cli_http_roundtrip(tmp_path):
         RPM="0",
         MINIMA_DEBUG="",
         MINIMA_TRACE_FILE="",
+        CACHE_FORCE_REFRESH="0",
     )
     try:
         proc = subprocess.run(
@@ -160,7 +161,7 @@ def test_document_cli_http_roundtrip(tmp_path):
                 "autojudge_base.cli",
                 "run",
                 "--workflow",
-                "judges/generic/document-workflow.yml",
+                "judges/generic/workflow.yml",
                 "--rag-responses",
                 str(runs),
                 "--rag-topics",
@@ -181,6 +182,18 @@ def test_document_cli_http_roundtrip(tmp_path):
     assert seen and set(seen) == {"injected-test-model"}
     assert list((tmp_path / "out").glob("*.eval.txt"))
     assert list((tmp_path / "out").glob("*.supported-claims.jsonl"))
+    # The server is closed: the identical request must replay from the cache.
+    env.update(OPENAI_BASE_URL="EMPTY", OPENAI_API_KEY="EMPTY")
+    replay_command = list(proc.args)
+    replay_command[-1] = str(tmp_path / "offline")
+    replay = subprocess.run(
+        replay_command, env=env, capture_output=True, text=True, timeout=60
+    )
+    assert replay.returncode == 0, replay.stdout + replay.stderr
+    for suffix in (".eval.txt", ".supported-claims.jsonl", ".support.json"):
+        online = next((tmp_path / "out").glob("*" + suffix))
+        offline = next((tmp_path / "offline").glob("*" + suffix))
+        assert online.read_text() == offline.read_text()
 
 
 @pytest.mark.parametrize("limit, succeeds", [(0.001, False), (0.5, True)])
