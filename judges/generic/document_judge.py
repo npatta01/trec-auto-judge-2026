@@ -11,7 +11,7 @@ from autojudge_base import LeaderboardBuilder, LeaderboardSpec, MeasureSpec
 from minima_llm import MinimaLlmRequest, MinimaLlmResponse
 
 from .client import make_backend
-from .budget import BudgetBackend
+from .budget import BudgetBackend, with_openrouter_options
 from .document_pipeline import evaluate, messages, Verdicts
 from .models import JudgeError, RunStopped
 from .private_io import private_directory, write_private_text
@@ -54,8 +54,11 @@ class DocumentJudge:
         budget_ledger="output/budget20/budget.sqlite3",
         budget_cap_usd=16.0,
         run_budget_usd=0.50,
+        replay_provider=None,
         **kwargs,
     ):
+        if replay_provider not in (None, "openrouter"):
+            raise JudgeError("Unsupported replay provider.")
         path = Path(filebase)
         if not path.name or path.name in (".", "..") or ".." in path.parts:
             raise JudgeError("Unsafe artifact basename.")
@@ -115,6 +118,14 @@ class DocumentJudge:
                         },
                     },
                 )
+                # EMPTY intentionally forgets the endpoint. Reproduce the original
+                # provider options explicitly so existing paid cache keys still hit.
+                # Live OpenRouter always goes through BudgetBackend above.
+                if (
+                    getattr(getattr(backend, "cfg", None), "base_url", None) == "EMPTY"
+                    and replay_provider == "openrouter"
+                ):
+                    req = with_openrouter_options(req, completion_price=4)
                 # Never surface provider errors containing request data.
                 with (
                     open(os.devnull, "w") as sink,

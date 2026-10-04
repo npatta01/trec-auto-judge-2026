@@ -42,10 +42,17 @@ Minor observations: DocumentJudge lacks a blank-topic-ID guard; the shared ledge
 path is relative to the working directory; the $0.50 per-run cap is a development
 cap, not a full-track budget. Optional style/doc nits do not justify more refactoring.
 
-## Next action
+## Replay fix follow-up (2026-10-04)
 
-Before relying on OpenRouter offline replay, add a synthetic regression for that
-exact provider-configured path and preserve identical semantic request options
-online/offline without weakening the paid-call budget guard. This is a separate
-behavior fix, not hidden inside the cleanup. Review this result before publishing
-the local follow-up; do not merge automatically.
+The user authorized the replay bug fix. A failing real-client/cache regression
+reproduced the mismatch. Request-option construction now lives in a shared helper;
+`replay_provider=openrouter` restores those options for the EMPTY endpoint without
+using the paid budget adapter. Existing v4 request keys are preserved. Live calls
+still require the budget guard, and cache misses still fail. Documentation records
+the explicit offline setting rather than guessing the provider from a model name.
+
+Verification: real-client/cache replay with synthetic HTTP responses, live-budget
+denial even with the replay option, unknown-provider rejection, and full suite.
+Result: 79 passed, 2 expected failures; Ruff F and diff whitespace checks pass.
+No credentials, existing caches or paid endpoints were accessed for these tests.
+The cleanup and fix remain local; do not merge automatically.

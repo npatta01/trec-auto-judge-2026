@@ -15,6 +15,21 @@ from .models import JudgeError, RunStopped
 from .private_io import private_directory, prepare_private_file
 
 
+def with_openrouter_options(req, *, completion_price):
+    """Keep paid and cache-only requests identical without coupling replay to a ledger."""
+    extra = dict(req.extra or {})
+    extra.update(
+        provider={
+            "max_price": {"prompt": 1, "completion": completion_price, "request": 0},
+            "require_parameters": True,
+            "allow_fallbacks": False,
+            "data_collection": "deny",
+        },
+        reasoning=extra.get("reasoning", {"enabled": False}),
+    )
+    return replace(req, extra=extra)
+
+
 class BudgetBackend:
     def __init__(
         self, backend, ledger, cap=16.0, *, incremental_cap=None, completion_price=3
@@ -103,21 +118,9 @@ class BudgetBackend:
                 "INSERT INTO calls(reserved,run_id) VALUES (?,?)",
                 (reserved, self.run_id),
             ).lastrowid
-        extra = dict(req.extra or {})
-        extra.update(
-            provider={
-                "max_price": {
-                    "prompt": 1,
-                    "completion": self.completion_price,
-                    "request": 0,
-                },
-                "require_parameters": True,
-                "allow_fallbacks": False,
-                "data_collection": "deny",
-            },
-            reasoning=reasoning,
+        result = await self.backend.generate(
+            with_openrouter_options(req, completion_price=self.completion_price)
         )
-        result = await self.backend.generate(replace(req, extra=extra))
         cost, cached = None, 0
         if isinstance(result, MinimaLlmResponse):
             cached = int(result.cached)

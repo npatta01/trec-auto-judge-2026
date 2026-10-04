@@ -228,6 +228,7 @@ def test_normal_workflow_enforces_openrouter_budget(tmp_path, limit, succeeds):
             outdir=tmp_path,
             budget_ledger=str(tmp_path / "budget.db"),
             run_budget_usd=limit,
+            replay_provider="openrouter",  # Must not bypass the live spending guard.
         )
 
     if succeeds:

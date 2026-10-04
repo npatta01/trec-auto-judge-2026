@@ -14,3 +14,5 @@ settings:
   budget_ledger: output/budget20/budget.sqlite3
   budget_cap_usd: 16.0
   run_budget_usd: 0.50
+  # For EMPTY-endpoint replay of OpenRouter caches: -J replay_provider=openrouter
+  replay_provider: null

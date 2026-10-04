@@ -78,7 +78,22 @@ normalization coverage was retained independently.
 The [v4 live check](v4-live-results.md) processed 80 real citation pairs for
 $0.020631725. This verifies a small workflow sample, not broad semantic accuracy.
 
-Known limitation: OpenRouter adds provider options to requests inside the budget
-adapter, while `OPENAI_BASE_URL=EMPTY` bypasses that adapter. Those options enter
-the cache key, so the loopback replay test does not establish offline replay of
-OpenRouter runs. Resolve this before relying on that reproducibility path.
+## Replaying OpenRouter caches offline
+
+Keep the same `CACHE_DIR`, `OPENAI_MODEL`, inputs and token/batching settings as
+the original run. Set `CACHE_FORCE_REFRESH=0`, `OPENAI_BASE_URL=EMPTY` and
+`OPENAI_API_KEY=EMPTY`, and add `-J replay_provider=openrouter` to the run command.
+For caches from other endpoints, leave `replay_provider` unset.
+
+The explicit replay provider restores the exact OpenRouter pricing/privacy options
+that enter cache keys; EMPTY alone cannot identify the original provider. It uses
+the same request-option helper as live calls, without constructing a budget ledger
+or reserving money. Live OpenRouter calls remain budget-guarded even if this option
+is set. No cache migration or paid regeneration is required for existing v4 keys.
+An absent entry still fails and withholds the leaderboard; no provider fallback
+or synthetic judgment is used. Offline support sidecars have null budget fields
+because no paid invocation occurred; judgment/provenance fields stay unchanged.
+
+Regression coverage runs the real client/cache and budget adapter with synthetic
+HTTP responses, then replays at EMPTY and verifies cache hits, unchanged judgments,
+no ledger creation and failure on a genuinely new claim. No paid calls are needed.
