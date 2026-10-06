@@ -1,5 +1,33 @@
 # Shared judge baseline
 
+## Architecture overview
+
+![AutoJudge architecture: prepare shared evidence and a question-guided checklist; grade each answer using that checklist and saved citation judgments; aggregate separate RAG and RAGTIME proxies into pairwise, evidence, or combined leaderboards.](images/autojudge-architecture.png)
+
+[Open the full-resolution architecture image](images/autojudge-architecture.png).
+The example question and document excerpts in the illustration are synthetic.
+
+Read the visual in three sections:
+
+1. **Prepare once per question:** check claims against cited documents, split
+   overlong documents when needed, deduplicate evidence, and generate a reference
+   answer plus one shared checklist. The checklist distinguishes factual from
+   request requirements and core from optional items.
+2. **Grade each answer:** measure checklist coverage separately from evidence
+   support, then join coverage to saved citation judgments. Resolve supported
+   portions only where necessary; do not automatically rejudge citations.
+3. **Rank systems:** choose blind pairwise, track-specific evidence scoring, or
+   their configured combination. The blind pairwise path bypasses reference and
+   evidence generation. Aggregate answer-level results across questions into
+   system leaderboards.
+
+Partial credit of 0.5 in the visual applies to grounded checklist coverage—not
+to every citation metric. Scores are experimental proxies, not official metric
+implementations. The diagram explains the implemented baseline; it does not
+certify full-track submission readiness.
+
+## Configuration and scoring
+
 One shared pipeline, separate RAG and RAGTIME proxies. The existing citation
 workflow remains intact. `judges/generic/unified-workflow.yml` has six variants:
 `rag-pairwise`, `rag-evidence`, `rag-combined`, and their `ragtime-*` equivalents.
