@@ -1,0 +1,18 @@
+judge_class: "judges.generic.document_judge:DocumentJudge"
+create_nuggets: false
+create_qrels: false
+judge: true
+uses_llm: true
+settings:
+  filebase: "document-support"
+  document_tokens: 24000
+  overlap_tokens: 256
+  context_tokens: 64000
+  output_tokens: 8192
+  safety_tokens: 2048
+  batch_size: 5
+  budget_ledger: output/budget20/budget.sqlite3
+  budget_cap_usd: 16.0
+  run_budget_usd: 0.50
+  # For EMPTY-endpoint replay of OpenRouter caches: -J replay_provider=openrouter
+  replay_provider: null
