@@ -1,0 +1,30 @@
+judge_class: "judges.generic.unified:UnifiedJudge"
+uses_llm: true
+create_nuggets: false
+create_qrels: false
+judge: true
+settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  repair_reference_length: true
+  filebase: "{_name}"
+  pairwise_weight: 0.5
+  max_pairs: 100
+  max_input_tokens: 45000
+  document_tokens: 24000
+  context_tokens: 64000
+  budget_ledger: output/budget20/budget.sqlite3
+  run_budget_usd: 0.5
+variants:
+  rag-pairwise:
+    judge_settings: {track: rag, method: pairwise}
+  rag-evidence:
+    judge_settings: {track: rag, method: evidence}
+  rag-combined:
+    judge_settings: {track: rag, method: combined}
+  ragtime-pairwise:
+    judge_settings: {track: ragtime, method: pairwise}
+  ragtime-evidence:
+    judge_settings: {track: ragtime, method: evidence}
+  ragtime-combined:
+    judge_settings: {track: ragtime, method: combined}
