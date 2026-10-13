@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>TREC AutoJudge · Submission architecture</title>
+<link rel="stylesheet" href="assets/architecture-theme.css">
+<link rel="stylesheet" href="assets/submission-architecture.css">
+</head>
+<body>
+<main id="hub">
+  <header class="app-toolbar">
+    <a class="viewer-brand" href="submission-architecture.md">TREC AutoJudge</a>
+    <label class="theme-switch">Theme <select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
+  </header>
+  <h1>Our submission architecture</h1>
+  <p class="subtitle">Explore the three approaches, evidence flow and scoring handoff.</p>
+  <p class="notice" id="demo-notice"><strong>Public source demo.</strong> Artifact metadata below is synthetic. No saved answers, evidence text, judgments or actual receipt files are included.</p>
+<section id="viewer" aria-label="Submission architecture">
+  <header>
+    <div>
+      <nav role="tablist" aria-label="Architecture sections">
+        <button id="architecture-tab-0" type="button" role="tab" data-figure="0" aria-controls="architecture-overview" aria-selected="true">1. Overview</button>
+        <button id="architecture-tab-1" type="button" role="tab" data-figure="1" aria-controls="architecture-evidence" aria-selected="false" tabindex="-1">2. Evidence flow</button>
+        <button id="architecture-tab-2" type="button" role="tab" data-figure="2" aria-controls="architecture-scoring" aria-selected="false" tabindex="-1">3. Scoring &amp; submission</button>
+      </nav>
+    </div>
+  </header>
+  <section id="architecture-overview" class="architecture-panel" role="tabpanel" aria-labelledby="architecture-tab-0">
+    <h2>Three approaches. Two tracks.</h2>
+    <p class="architecture-intro">The same saved answers feed three independent rankings. Combined reuses the other two branches—it does not judge them again.</p>
+    <div class="architecture-methods">
+      <article class="architecture-method architecture-pairwise">
+        <div class="architecture-method-title"><span class="architecture-symbol">P</span><h3>Pairwise</h3></div>
+        <p>Which answer is better, head to head?</p>
+        <ol class="architecture-mini-flow"><li>Question + two answers</li><li>Sparse-10 opponents · both presentation orders</li><li>Saved votes → fitted strengths</li></ol>
+        <div class="architecture-output"><strong>Pairwise score P</strong><span>Expected win fraction across the cohort</span></div>
+        <p class="architecture-footnote">Blind comparisons: no generated reference or checklist.</p>
+        <div class="architecture-links"><button type="button" data-architecture-package="rag:pairwise">RAG artifacts</button><button type="button" data-architecture-package="ragtime:pairwise">RAGTIME artifacts</button></div>
+      </article>
+      <article class="architecture-method architecture-evidence">
+        <div class="architecture-method-title"><span class="architecture-symbol">E</span><h3>Evidence</h3></div>
+        <p>Does the answer cover the need—and support its claims?</p>
+        <ol class="architecture-mini-flow"><li>One shared reference + checklist</li><li>Coverage + saved own-citation support</li><li>Track-specific aggregation</li></ol>
+        <div class="architecture-output"><strong>Evidence score E</strong><span>Coverage and citations, with partial credit</span></div>
+        <p class="architecture-footnote">Sources from another answer do not repair this answer’s citations.</p>
+        <div class="architecture-links"><button type="button" data-architecture-package="rag:evidence">RAG artifacts</button><button type="button" data-architecture-package="ragtime:evidence">RAGTIME artifacts</button></div>
+      </article>
+      <article class="architecture-method architecture-combined">
+        <div class="architecture-method-title"><span class="architecture-symbol">C</span><h3>Combined</h3></div>
+        <p>Blend the two complementary signals.</p>
+        <div class="architecture-blend" aria-label="Half pairwise plus half evidence"><span><strong>50%</strong>Pairwise P</span><b aria-hidden="true">+</b><span><strong>50%</strong>Evidence E</span></div>
+        <div class="architecture-output"><strong>0.5 × P + 0.5 × E</strong><span>Reuse the saved per-question scores</span></div>
+        <p class="architecture-footnote">No extra model calls for fusion. Components stay available for audit.</p>
+        <div class="architecture-links"><button type="button" data-architecture-package="rag:combined">RAG artifacts</button><button type="button" data-architecture-package="ragtime:combined">RAGTIME artifacts</button></div>
+      </article>
+    </div>
+    <div class="architecture-bridge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v17m-6-6 6 6 6-6"/></svg><p><strong>For each approach separately</strong><br>Per-question scores → mean across topics for each system → highest score first</p></div>
+    <div class="architecture-tracks"><div><h3>RAG</h3><p>Request coverage + citation precision + citation recall</p></div><div><h3>RAGTIME</h3><p>Grounded factual coverage + top-citation sentence support</p></div></div>
+    <p class="architecture-caveat">These are our declared judging proxies, not the organizers’ hidden assessments or official weights.</p>
+  </section>
+  <section id="architecture-evidence" class="architecture-panel" role="tabpanel" aria-labelledby="architecture-tab-1" hidden>
+    <h2>One checklist. Separate judgments.</h2>
+    <p class="architecture-intro">Build a common judging aid once per question. Evaluate each answer against it, then join coverage to that answer’s own saved evidence.</p>
+    <ol class="architecture-flow">
+      <li><span class="architecture-step">1</span><div><h3>Save claim–citation judgments</h3><p>Check claims against their cited documents. Retain support labels, segment IDs and provenance so successful work can be reused.</p><div class="architecture-support"><span>Full support <strong>1</strong></span><span>Partial support <strong>0.5</strong></span><span>Unsupported / uncertain <strong>0</strong></span></div></div></li>
+      <li><span class="architecture-step">2</span><div><h3>Generate a shared reference + checklist</h3><p>The full question guides both outputs. Use pooled evidence excerpts when they fit; otherwise use exact-deduplicated validated claims with provenance.</p><details><summary>What goes into the reference?</summary><p>Fully supported claims can supply candidate facts. Partial claims remain flagged, non-citable guidance in the compact route—not fully established compound facts. There is no silent truncation.</p><p>The reference obeys the question’s answer limit. The checklist and unresolved gaps are separate. This is an internal judging aid, not official gold.</p></details><details><summary>What makes a checklist item count?</summary><p>Each item has a factual/request kind and core/optional priority. Freeze one checklist for all answers. Accepted alternatives are sufficient routes, not extra obligations; missing optional details does not lower coverage.</p></details></div></li>
+      <li><span class="architecture-step">3</span><div><h3>Grade coverage only</h3><p>The grader sees the question, checklist and submitted answer segments. It does not see source documents or citation-support labels.</p><div class="architecture-output"><strong>Covered · Partial · Missing</strong><span>Each decision points to exact answer segment IDs</span></div></div></li>
+      <li><span class="architecture-step">4</span><div><h3>Join coverage to own-citation support</h3><p>Code joins those segment IDs to saved citation judgments. When needed, a bounded alignment resolves which supported portion of a partial claim covers a factual item.</p><p class="architecture-footnote">Coverage is not the same as grounding. The original citation labels stay unchanged.</p></div></li>
+      <li><span class="architecture-step">5</span><div><h3>Apply the track’s formula</h3><p>RAG combines request coverage, citation precision and recall. RAGTIME combines grounded factual coverage and top-citation support. Retain the components and intermediate judgments for audit.</p><button type="button" data-architecture-next="2">See scoring &amp; submission</button></div></li>
+    </ol>
+  </section>
+  <section id="architecture-scoring" class="architecture-panel" role="tabpanel" aria-labelledby="architecture-tab-2" hidden>
+    <h2>From judgments to submissions</h2>
+    <p class="architecture-intro">Track-specific evidence scores, independent ranking outputs, and a receipt-backed handoff.</p>
+    <div class="architecture-formulas">
+      <article><h3>RAG evidence score</h3><p class="architecture-equation">E = mean of three components</p><dl><div><dt>Request coverage</dt><dd>Core checklist coverage, including partial credit</dd></div><div><dt>Citation precision</dt><dd>Average credit per citation pair</dd></div><div><dt>Citation recall</dt><dd>Best single citation credit per substantive segment</dd></div></dl></article>
+      <article><h3>RAGTIME evidence score</h3><p class="architecture-equation">E = mean of two components</p><dl><div><dt>Grounded factual coverage</dt><dd>Factual-core checklist items supported by the answer’s own evidence</dd></div><div><dt>Top-citation sentence support</dt><dd>Credit for the top-priority citation per substantive segment</dd></div></dl></article>
+    </div>
+    <div class="architecture-credit-rule"><h3>Partial support earns partial credit</h3><div class="architecture-support"><span>Full support <strong>1</strong></span><span>Partial support <strong>0.5</strong></span><span>Unsupported / uncertain <strong>0</strong></span></div><p>Exclude only explicitly flagged non-claim segments. A factual heading is still a claim. Optional checklist items do not lower coverage.</p></div>
+    <div class="architecture-ranking"><h3>Three outputs, ranked independently</h3><div><span><strong>Pairwise</strong>P</span><span><strong>Evidence</strong>E</span><span><strong>Combined</strong>0.5 × P + 0.5 × E</span></div><p>For each method: per-question scores → each system’s mean across topics → higher score ranks first.</p></div>
+    <section class="architecture-handoff" aria-labelledby="architecture-handoff-title"><h3 id="architecture-handoff-title">Verified handoff</h3><ol><li><strong>Validate</strong><span>Completeness, replay, fusion, custody and container checks</span></li><li><strong>Package</strong><span>Numeric leaderboard + sidecars; raw judgments stay private</span></li><li><strong>Upload</strong><span>TIRA data submission</span></li><li><strong>Record</strong><span>Confirmed receipt + submission ledger</span></li></ol></section>
+    <div class="architecture-receipts"><h3>Example artifact packages</h3><p id="architecture-receipt-summary" class="architecture-footnote"></p><div id="architecture-submissions"></div><p class="architecture-caveat">These six links illustrate the package handoff. This public demo contains no actual submission receipts or saved competition scores.</p></div>
+    <p class="architecture-caveat">Declared proxy formulas—not official organizer weights. Implementation map as of 12 October 2026.</p>
+  </section>
+</section>
+<section id="demo-package" class="demo-package" hidden aria-labelledby="demo-package-title">
+  <h2 id="demo-package-title" tabindex="-1">Example package</h2>
+  <p id="demo-package-description"></p>
+  <p class="architecture-caveat">This is a synthetic example, not a TIRA receipt. No files are uploaded and no model calls are made.</p>
+</section>
+<footer><a href="submission-architecture.md">Implementation &amp; integration guide</a><a href="https://github.com/trec-auto-judge/.github/blob/main/profile/howto/data-policy.md" target="_blank" rel="noopener">Organizer data policy</a></footer>
+</main>
+<script id="architecture-data" type="application/json">{"demo":true,"packages":[{"track":"rag","method":"pairwise","group":"DEMO-P-RAG"},{"track":"ragtime","method":"pairwise","group":"DEMO-P-RAGTIME"},{"track":"rag","method":"evidence","group":"DEMO-E-RAG"},{"track":"ragtime","method":"evidence","group":"DEMO-E-RAGTIME"},{"track":"rag","method":"combined","group":"DEMO-C-RAG"},{"track":"ragtime","method":"combined","group":"DEMO-C-RAGTIME"}]}</script>
+<script src="assets/submission-architecture.js"></script>
+<script src="assets/architecture-demo.js"></script>
+</body>
+</html>

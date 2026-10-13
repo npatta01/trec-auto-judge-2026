@@ -7,6 +7,11 @@ preserves provenance, and produces answer-level support proxies. It is not an
 official host-track metric or a validated replacement for human judgments.
 The organizer's setup and example documentation follows below.
 
+The [native submission architecture guide](docs/submission-architecture.md)
+explains the pairwise, evidence and combined approaches. Its standalone,
+responsive HTML demo contains only synthetic artifact metadata—not saved
+competition answers, scores or actual submission receipts.
+
 <p align="center">
    <img width=120px src="https://trec-auto-judge.cs.unh.edu/media/trec-auto-judge-logo-small.png">
    <br/>
