@@ -12,5 +12,13 @@ output/
 results/
 *.zip
 
+# Local endpoint credentials and decrypted secret material
+.env
+.env.*
+!.env.example
+*.dec.*
+config/secrets.env
+config/secrets.decrypted.env
+
 # Fetched evaluation data (fetch_datasets.py); never committed
 /local-data/

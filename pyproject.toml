@@ -29,6 +29,7 @@ classifiers = [
 dependencies = [
     "autojudge-base>=1.0.0",
     "tira>=0.0.100",
+    "scipy>=1.10",
 ]
 
 [project.optional-dependencies]

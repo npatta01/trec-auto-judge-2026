@@ -1,0 +1,40 @@
+measures:
+- name: RAG_EVIDENCE_COMPOSITE_PROXY
+  dtype: float
+  description: Experimental RAG_EVIDENCE_COMPOSITE_PROXY; [0,1], equal topic mean.
+    See unified-judge-plan.md for proxy definitions and unknown organizer rules. Evidence
+    = arithmetic mean of RAG_REQUEST_COVERAGE_PROXY, RAG_CITATION_PRECISION_PARTIAL_PROXY,
+    RAG_CITATION_RECALL_PARTIAL_PROXY. Combined = 0.5 * pairwise + 0.5 * evidence.
+- name: RAG_CITATION_PRECISION_UNWEIGHTED_PROXY
+  dtype: float
+  description: Experimental RAG_CITATION_PRECISION_UNWEIGHTED_PROXY; [0,1], equal
+    topic mean. See unified-judge-plan.md for proxy definitions and unknown organizer
+    rules.
+- name: RAG_CITATION_RECALL_UNWEIGHTED_PROXY
+  dtype: float
+  description: Experimental RAG_CITATION_RECALL_UNWEIGHTED_PROXY; [0,1], equal topic
+    mean. See unified-judge-plan.md for proxy definitions and unknown organizer rules.
+- name: RAG_CITATION_PRECISION_PARTIAL_PROXY
+  dtype: float
+  description: 'Mean individual citation-pair credit on substantive segments: full=1,
+    partial=0.5, unsupported/uncertain=0; flagged non-claim pairs excluded, unit weights,
+    empty denominator=0. Not official weighted precision.'
+- name: RAG_CITATION_RECALL_PARTIAL_PROXY
+  dtype: float
+  description: 'Mean best-single-citation credit per substantive segment: full=1,
+    partial=0.5, unsupported/uncertain/uncited=0; flagged non-claims excluded, unit
+    weights, empty denominator=0. Partial citations are not summed; not official weighted
+    recall.'
+- name: RAG_GROUNDED_COVERAGE_PARTIAL_PROXY
+  dtype: float
+  description: 'Experimental factual-core grounded coverage: full supported portion=1,
+    partial=0.5, unresolved=0; optional/request items excluded. Saved-evidence alignment
+    is controlled by resolve_partial_grounding. Not an official metric.'
+- name: RAG_GROUNDED_CHECKLIST_RECALL_PROXY
+  dtype: float
+  description: Experimental RAG_GROUNDED_CHECKLIST_RECALL_PROXY; [0,1], equal topic
+    mean. See unified-judge-plan.md for proxy definitions and unknown organizer rules.
+- name: RAG_REQUEST_COVERAGE_PROXY
+  dtype: float
+  description: Experimental RAG_REQUEST_COVERAGE_PROXY; [0,1], equal topic mean. See
+    unified-judge-plan.md for proxy definitions and unknown organizer rules.

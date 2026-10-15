@@ -1,0 +1,26 @@
+measures:
+- name: RAGTIME_EVIDENCE_COMPOSITE_PROXY
+  dtype: float
+  description: Experimental RAGTIME_EVIDENCE_COMPOSITE_PROXY; [0,1], equal topic mean.
+    See unified-judge-plan.md for proxy definitions and unknown organizer rules. Evidence
+    = arithmetic mean of RAGTIME_GROUNDED_COVERAGE_PARTIAL_PROXY, RAGTIME_SENTENCE_SUPPORT_PARTIAL_PROXY.
+    Combined = 0.5 * pairwise + 0.5 * evidence.
+- name: RAGTIME_SENTENCE_SUPPORT_PARTIAL_PROXY
+  dtype: float
+  description: 'Top-priority citation credit / substantive segments: full=1, partial=0.5,
+    unsupported/uncertain/uncited=0; flagged non-claims excluded, empty denominator=0.
+    Not official sentence eligibility.'
+- name: RAGTIME_GROUNDED_NUGGET_RECALL_ESTIMATE
+  dtype: float
+  description: Experimental RAGTIME_GROUNDED_NUGGET_RECALL_ESTIMATE; [0,1], equal
+    topic mean. See unified-judge-plan.md for proxy definitions and unknown organizer
+    rules.
+- name: RAGTIME_SENTENCE_SUPPORT_PROXY
+  dtype: float
+  description: Experimental RAGTIME_SENTENCE_SUPPORT_PROXY; [0,1], equal topic mean.
+    See unified-judge-plan.md for proxy definitions and unknown organizer rules.
+- name: RAGTIME_GROUNDED_COVERAGE_PARTIAL_PROXY
+  dtype: float
+  description: 'Experimental factual-core grounded coverage: full supported portion=1,
+    partial=0.5, unresolved=0; optional/request items excluded. Saved-evidence alignment
+    is controlled by resolve_partial_grounding. Not an official metric.'

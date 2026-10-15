@@ -1,0 +1,5 @@
+measures:
+- name: RAGTIME_PAIRWISE_BLIND_BT_PROXY
+  dtype: float
+  description: Experimental RAGTIME_PAIRWISE_BLIND_BT_PROXY; [0,1], equal topic mean.
+    See unified-judge-plan.md for proxy definitions and unknown organizer rules.

@@ -2,8 +2,6 @@
 
 import asyncio
 import json
-import os
-from contextlib import redirect_stdout, redirect_stderr
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -14,7 +12,7 @@ from .client import make_backend
 from .budget import BudgetBackend, with_openrouter_options
 from .document_pipeline import evaluate, messages, Verdicts
 from .models import JudgeError, RunStopped
-from .private_io import private_directory, write_private_text
+from .private_io import private_directory, quiet_output, write_private_text
 
 SPEC = LeaderboardSpec(
     measures=(
@@ -127,11 +125,7 @@ class DocumentJudge:
                 ):
                     req = with_openrouter_options(req, completion_price=4)
                 # Never surface provider errors containing request data.
-                with (
-                    open(os.devnull, "w") as sink,
-                    redirect_stdout(sink),
-                    redirect_stderr(sink),
-                ):
+                with quiet_output():
                     try:
                         result = await backend.generate(req)
                     except RunStopped:

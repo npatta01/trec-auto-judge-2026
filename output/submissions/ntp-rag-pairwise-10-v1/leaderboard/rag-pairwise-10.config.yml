@@ -1,0 +1,65 @@
+name: rag-pairwise-10
+create_nuggets: false
+create_qrels: false
+judge: true
+llm_model: openai/gpt-6-luna
+timestamp: '2026-10-07T22:37:05.400865+00:00'
+git:
+  commit: 238a5de6ad5ae3c489f1c956f8b3fe41c1423622
+  dirty: 'true'
+  remote: https://github.com/npatta01/trec-auto-judge-2026.git
+settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  repair_reference_length: true
+  filebase: '{_name}'
+  pairwise_weight: 0.5
+  max_pairs: 100
+  max_input_tokens: 45000
+  document_tokens: 24000
+  context_tokens: 64000
+  budget_ledger: /home/npatta01/data/competitions/trec_autojudge_2026/output/budget20/budget.sqlite3
+  run_budget_usd: 100
+  pairwise_concurrency: 32
+nugget_settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  repair_reference_length: true
+  filebase: '{_name}'
+  pairwise_weight: 0.5
+  max_pairs: 100
+  max_input_tokens: 45000
+  document_tokens: 24000
+  context_tokens: 64000
+  budget_ledger: /home/npatta01/data/competitions/trec_autojudge_2026/output/budget20/budget.sqlite3
+  run_budget_usd: 100
+  pairwise_concurrency: 32
+judge_settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  repair_reference_length: true
+  filebase: '{_name}'
+  pairwise_weight: 0.5
+  max_pairs: 415
+  max_input_tokens: 45000
+  document_tokens: 24000
+  context_tokens: 64000
+  budget_ledger: /home/npatta01/data/competitions/trec_autojudge_2026/output/budget20/budget.sqlite3
+  run_budget_usd: 100
+  pairwise_concurrency: 32
+  track: rag
+  method: pairwise
+  pairwise_opponents: 10
+qrels_settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  repair_reference_length: true
+  filebase: '{_name}'
+  pairwise_weight: 0.5
+  max_pairs: 100
+  max_input_tokens: 45000
+  document_tokens: 24000
+  context_tokens: 64000
+  budget_ledger: /home/npatta01/data/competitions/trec_autojudge_2026/output/budget20/budget.sqlite3
+  run_budget_usd: 100
+  pairwise_concurrency: 32
