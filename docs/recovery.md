@@ -53,3 +53,7 @@ git clone --branch codex/shared-track-judge recovered/source-history-20261015.pr
 `recovered/working-snapshot/` retains uncommitted working source and historical documents. `private-artifacts.git` contains the `private-snapshot` and `archive-control` branches. The latter retains the frozen image and encrypted claim receipts. Prefer selective extraction from `private-snapshot`: expanding all historical duplicate paths uses far more space than the compressed Git storage. Restore raw artifacts only into owner-only local storage. The [organizer data policy](https://github.com/trec-auto-judge/.github/blob/main/profile/howto/data-policy.md) continues to apply.
 
 `recovery-verification.json` on the release records the final verification gates. The older `status.json` inside the archived 2026-10-12 backup is historical; it must not be mistaken for the release's current closure record.
+
+## Verification limit at publication
+
+The ciphertext transfer, full OpenPGP authentication, zstd/tar structure, safe source/ref restoration, native Git connectivity and strict loose-object checks passed. The full native scan including the multi-gigabyte packed blobs is still running; its success is not claimed. Keep the original and independent local backup while that deep scan is pending. The release already preserves their selected useful files off-machine.

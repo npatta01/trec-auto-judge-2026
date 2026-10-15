@@ -3,6 +3,9 @@
 set -euo pipefail
 umask 077
 : "${key:?Run this script through sops exec-env recovery-key.sops.json}"
+task_recovery_passphrase=$key
+export -n task_recovery_passphrase
+unset key
 if [[ $# -ne 1 || -e "$1" || -L "$1" ]]; then
   echo 'Supply one new output filename; existing files are never overwritten.' >&2
   exit 2
@@ -30,8 +33,8 @@ parts=()
 while IFS= read -r part; do parts+=("$part"); done < "$part_list"
 # GnuPG verifies OpenPGP integrity before this script offers an archive for extraction.
 cat "${parts[@]}" | env -u key gpg --no-options --batch --yes --pinentry-mode loopback \
-  --no-symkey-cache --passphrase-fd 3 --output "$partial" --decrypt 3<<<"$key"
-unset key
+  --no-symkey-cache --passphrase-fd 3 --output "$partial" --decrypt 3<<<"$task_recovery_passphrase"
+unset task_recovery_passphrase
 zstd --test --quiet "$partial"
 # Both paths are in the same directory. Atomic hard-link creation never replaces
 # a file, directory or symlink that appeared while decryption was running.

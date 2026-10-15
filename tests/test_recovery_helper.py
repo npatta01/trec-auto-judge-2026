@@ -97,3 +97,21 @@ def test_optimized_python_cannot_disable_part_size_validation(recovery):
     assert result.returncode != 0
     assert not destination.exists()
     assert not list(folder.glob("*.partial.*"))
+
+
+def test_plaintext_passphrase_not_inherited_by_preflight_children(recovery):
+    folder, manifest, env = recovery
+    write_controls(folder, manifest)
+    bindir = folder / "bin"
+    bindir.mkdir()
+    real_sha = shutil.which("sha256sum")
+    check = bindir / "sha256sum"
+    check.write_text('#!/bin/sh\nif [ "${key+x}" = x ]; then exit 90; fi\n'
+                     'exec "' + real_sha + '" "$@"\n')
+    check.chmod(0o755)
+    env["PATH"] = str(bindir) + os.pathsep + env["PATH"]
+    destination = folder / "result.tar.zst"
+    result = subprocess.run(["bash", "decrypt-recovery.sh", str(destination)],
+                            cwd=folder, env=env, capture_output=True, timeout=20)
+    assert result.returncode == 0
+    assert destination.is_file()
