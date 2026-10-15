@@ -3,7 +3,7 @@
 set -euo pipefail
 umask 077
 : "${key:?Run this script through sops exec-env recovery-key.sops.json}"
-if [[ $# -ne 1 || -e "$1" ]]; then
+if [[ $# -ne 1 || -e "$1" || -L "$1" ]]; then
   echo 'Supply one new output filename; existing files are never overwritten.' >&2
   exit 2
 fi
@@ -13,21 +13,31 @@ part_list=$(mktemp)
 partial=$(mktemp "${1}.partial.XXXXXX")
 trap 'rm -f "$part_list" "$partial"' EXIT
 python3 - <<'PY_PARTS' > "$part_list"
-import json,re
+import json
 from pathlib import Path
 parts=json.loads(Path('recovery-manifest.json').read_text())['parts']
-assert parts
+if not parts:
+    raise ValueError("Recovery manifest contains no parts")
 for i,p in enumerate(parts):
-    assert p['name']==f'private-recovery.tar.zst.gpg.part-{i:03d}'
-    f=Path(p['name']); assert f.is_file() and not f.is_symlink()
-    assert f.stat().st_size==p['size']
+    if p['name'] != f'private-recovery.tar.zst.gpg.part-{i:03d}':
+        raise ValueError('Unexpected part name or order')
+    f=Path(p['name'])
+    if not f.is_file() or f.is_symlink() or f.stat().st_size != p['size']:
+        raise ValueError('Missing, linked or incorrectly sized part')
     print(p['name'])
 PY_PARTS
-mapfile -t parts < "$part_list"
+parts=()
+while IFS= read -r part; do parts+=("$part"); done < "$part_list"
 # GnuPG verifies OpenPGP integrity before this script offers an archive for extraction.
 cat "${parts[@]}" | env -u key gpg --no-options --batch --yes --pinentry-mode loopback \
   --no-symkey-cache --passphrase-fd 3 --output "$partial" --decrypt 3<<<"$key"
 unset key
 zstd --test --quiet "$partial"
-mv -- "$partial" "$1"
+# Both paths are in the same directory. Atomic hard-link creation never replaces
+# a file, directory or symlink that appeared while decryption was running.
+python3 - "$partial" "$1" <<'PY_FINALIZE'
+import os,sys
+os.link(sys.argv[1],sys.argv[2])
+os.unlink(sys.argv[1])
+PY_FINALIZE
 echo 'Authenticated private archive ready. Restore only into owner-only local storage.'

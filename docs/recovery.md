@@ -39,7 +39,7 @@ gh release download recovery-2026-10-15 --repo npatta01/trec-auto-judge-2026
 sops exec-env recovery-key.sops.json 'bash ./decrypt-recovery.sh private.tar.zst'
 ```
 
-The helper checks every ciphertext part, rejects missing/reordered filenames, verifies GnuPG integrity, and tests zstd before offering the archive for extraction. It never overwrites an existing output. Do not extract a partial or unauthenticated result. Allow roughly 60 GB for downloaded parts, the authenticated archive and restored Git objects, plus space for any artifact tree you choose to expand.
+The helper checks every ciphertext part, rejects missing/reordered filenames, verifies GnuPG integrity, and tests zstd before offering the archive for extraction. It never overwrites an existing output. Do not extract a partial or unauthenticated result. Allow at least 90 GB for downloaded parts, the authenticated archive and restored Git objects, plus space for any artifact tree you choose to expand.
 
 Recover the private Git storage and source snapshot:
 
