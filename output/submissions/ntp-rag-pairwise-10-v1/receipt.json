@@ -1,0 +1,75 @@
+{
+  "verified_at": "2026-10-07T21:26:03-04:00",
+  "task": "trec-auto-judge",
+  "team": "ntp",
+  "system": "ntp-rag-pairwise-10-v1",
+  "track": "rag",
+  "dataset": "rag26-20260827_1-test",
+  "data": {
+    "upload_group_id": 2459,
+    "run_id": "2026-10-08-03-05-46",
+    "receipt_verified": true,
+    "evaluation_run_id": "2026-10-08-01-06-07-evaluates-2026-10-08-03-05-46",
+    "evaluation_record_present": true,
+    "published": false,
+    "blinded": true,
+    "public_leaderboard_position": null,
+    "url": "https://www.tira.io/submit/trec-auto-judge/user/ntp/upload-submission"
+  },
+  "code": {
+    "software_id": 5168,
+    "receipt_verified": true,
+    "source_commit": "135b5c6905e70cc9b07fcd368f9b1b164e7acd63",
+    "command": "auto-judge run --workflow /auto-judge/judges/generic/unified-workflow.yml --variant rag-pairwise-10 --rag-responses $inputDataset/runs/*/ --rag-topics $inputDataset/topics/*.jsonl --out-dir $outputDir -S run_budget_usd=100 -S pairwise_concurrency=32 -S budget_ledger=/tmp/ntp-budget.sqlite3",
+    "cache_behaviour": "deterministic",
+    "mount_config": {"CACHE_DIR": "rw"},
+    "forward_environment_variable_names": ["OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_MODEL"],
+    "registered_tira_image": "registry.webis.de/code-research/tira/tira-user-ntp/trec-judge:latest-tira-docker-software-id-warped-refraction",
+    "registered_user_image": "registry.webis.de/code-research/tira/tira-user-ntp/trec-judge:latest",
+    "image_digest": null,
+    "remote_judge_execution_verified": false,
+    "remote_warm_cache_receipt_verified": false,
+    "url": "https://www.tira.io/submit/trec-auto-judge/user/ntp/code-submission"
+  },
+  "effective_method": {
+    "method": "pairwise",
+    "model": "openai/gpt-6-luna",
+    "reasoning": "high",
+    "mode": "blind",
+    "opponents_per_answer": 10,
+    "both_orders": true,
+    "max_unordered_pairs_per_topic": 415,
+    "concurrency": 32,
+    "measure": "RAG_PAIRWISE_BLIND_BT_PROXY"
+  },
+  "local_preflight_runtime": {
+    "python": "3.13.9",
+    "tira": "0.0.204",
+    "autojudge-base": "1.0.0",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "pydantic": "2.13.5",
+    "requests": "2.34.2",
+    "PyYAML": "6.0.3"
+  },
+  "verification": {
+    "runs": 83,
+    "topics": 119,
+    "score_rows_including_aggregates": 9960,
+    "numeric_completeness_passed": true,
+    "full_rag_host_replay_byte_identical": true,
+    "synthetic_container_controls_byte_identical": true,
+    "source_bundle_verified": true,
+    "full_rag_tira_container_validation": "blocked_before_execution_by_dataset_unpacking",
+    "evaluation_metric_values_inspected": false
+  },
+  "budget_snapshot": {
+    "cap_usd": 150,
+    "ledger_calls": 106628,
+    "reported_usd": 77.230299114,
+    "committed_including_reservations_usd": 89.269739114,
+    "unresolved_calls": 52,
+    "unresolved_reserved_usd": 12.03944,
+    "headroom_usd": 60.730260886
+  }
+}

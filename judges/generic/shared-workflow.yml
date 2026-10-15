@@ -1,0 +1,13 @@
+judge_class: "judges.generic.shared_judge:SharedJudge"
+create_nuggets: false
+create_qrels: false
+judge: true
+uses_llm: false
+settings:
+  filebase: "{_name}"
+  track: ragtime
+variants:
+  ragtime:
+    track: ragtime
+  rag:
+    track: rag

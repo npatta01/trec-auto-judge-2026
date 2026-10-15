@@ -1,0 +1,106 @@
+name: rag-evidence
+create_nuggets: false
+create_qrels: false
+judge: true
+llm_model: openai/gpt-6-luna
+timestamp: '2026-10-11T19:34:58.566171+00:00'
+git:
+  commit: c37a65716df83ba181f7080a38fdbfb117bad82b
+  dirty: 'false'
+  remote: /tmp/trec-tiktoken-packaging.BPe2GS
+settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  partial_max_output_tokens: 65536
+  repair_reference_length: true
+  repair_reference_output: true
+  repair_citation_output: true
+  citation_max_output_tokens: 65536
+  filebase: '{_name}'
+  pairwise_weight: 0.5
+  max_pairs: 100
+  max_input_tokens: 180000
+  document_tokens: 24000
+  context_tokens: 64000
+  evidence_concurrency: 1
+  budget_ledger: /home/npatta01/data/competitions/trec_autojudge_2026/output/budget20/budget.sqlite3
+  run_budget_usd: 137.49303926599998
+  repair_reference_ids: true
+  partial_context_tokens: 1050000
+  repair_coverage_contract: true
+  repair_partial_contract: true
+  question_concurrency: 2
+  defer_question_failures: true
+nugget_settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  partial_max_output_tokens: 65536
+  repair_reference_length: true
+  repair_reference_output: true
+  repair_citation_output: true
+  citation_max_output_tokens: 65536
+  filebase: '{_name}'
+  pairwise_weight: 0.5
+  max_pairs: 100
+  max_input_tokens: 180000
+  document_tokens: 24000
+  context_tokens: 64000
+  evidence_concurrency: 1
+  budget_ledger: /home/npatta01/data/competitions/trec_autojudge_2026/output/budget20/budget.sqlite3
+  run_budget_usd: 137.49303926599998
+  repair_reference_ids: true
+  partial_context_tokens: 1050000
+  repair_coverage_contract: true
+  repair_partial_contract: true
+  question_concurrency: 2
+  defer_question_failures: true
+judge_settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  partial_max_output_tokens: 65536
+  repair_reference_length: true
+  repair_reference_output: true
+  repair_citation_output: true
+  citation_max_output_tokens: 65536
+  filebase: '{_name}'
+  pairwise_weight: 0.5
+  max_pairs: 415
+  max_input_tokens: 180000
+  document_tokens: 24000
+  context_tokens: 64000
+  evidence_concurrency: 32
+  budget_ledger: /home/npatta01/data/competitions/trec_autojudge_2026/output/budget20/budget.sqlite3
+  run_budget_usd: 137.49303926599998
+  repair_reference_ids: true
+  partial_context_tokens: 1050000
+  repair_coverage_contract: true
+  repair_partial_contract: true
+  question_concurrency: 2
+  defer_question_failures: true
+  pairwise_opponents: 10
+  pairwise_concurrency: 32
+  track: rag
+  method: evidence
+qrels_settings:
+  coverage_mode: separate
+  resolve_partial_grounding: true
+  partial_max_output_tokens: 65536
+  repair_reference_length: true
+  repair_reference_output: true
+  repair_citation_output: true
+  citation_max_output_tokens: 65536
+  filebase: '{_name}'
+  pairwise_weight: 0.5
+  max_pairs: 100
+  max_input_tokens: 180000
+  document_tokens: 24000
+  context_tokens: 64000
+  evidence_concurrency: 1
+  budget_ledger: /home/npatta01/data/competitions/trec_autojudge_2026/output/budget20/budget.sqlite3
+  run_budget_usd: 137.49303926599998
+  repair_reference_ids: true
+  partial_context_tokens: 1050000
+  repair_coverage_contract: true
+  repair_partial_contract: true
+  question_concurrency: 2
+  defer_question_failures: true

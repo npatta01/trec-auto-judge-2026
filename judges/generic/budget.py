@@ -1,5 +1,6 @@
 """Conservative, restart-safe OpenRouter experiment budget; no prompt logging."""
 
+import hashlib
 import json
 import math
 import sqlite3
@@ -30,9 +31,46 @@ def with_openrouter_options(req, *, completion_price):
     return replace(req, extra=extra)
 
 
+def set_budget_cap(ledger, *, expected_cap, new_cap, expected_calls_sha256=None):
+    """Explicit operator action after user authorization; never clears reservations."""
+    if not math.isfinite(new_cap) or not 0 < new_cap <= 500:
+        raise JudgeError("Authorized budget ceiling must be positive and at most $500.")
+    with closing(sqlite3.connect(ledger)) as db, db:
+        db.execute("BEGIN IMMEDIATE")
+        current = db.execute("SELECT cap FROM policy WHERE id=1").fetchone()[0]
+        if current <= 0 or current != expected_cap:
+            raise JudgeError("Budget policy changed or locked; no automatic override.")
+        if expected_calls_sha256 is not None:
+            rows = db.execute(
+                "SELECT id,reserved,reported,run_id FROM calls ORDER BY id"
+            ).fetchall()
+            digest = hashlib.sha256(
+                json.dumps(rows, separators=(",", ":"), allow_nan=False).encode()
+            ).hexdigest()
+            if digest != expected_calls_sha256:
+                raise JudgeError("Approved call accounting changed; no budget override.")
+        db.execute(
+            "CREATE TABLE IF NOT EXISTS budget_changes (changed_at TEXT, old_cap REAL, new_cap REAL)"
+        )
+        db.execute(
+            "INSERT INTO budget_changes VALUES (datetime('now'),?,?)",
+            (current, new_cap),
+        )
+        db.execute("UPDATE policy SET cap=? WHERE id=1", (new_cap,))
+
+
 class BudgetBackend:
     def __init__(
-        self, backend, ledger, cap=16.0, *, incremental_cap=None, completion_price=3
+        self,
+        backend,
+        ledger,
+        cap=None,
+        *,
+        incremental_cap=None,
+        completion_price=3,
+        prompt_price=1,
+        max_output_tokens=8192,
+        data_collection="deny",
     ):
         if (
             backend.cfg.max_attempts != 1
@@ -41,10 +79,16 @@ class BudgetBackend:
             raise JudgeError(
                 "Budgeted experiments require OpenRouter and exactly one transport attempt."
             )
-        if not math.isfinite(cap) or not 0 < cap <= 16:
-            raise JudgeError("Experiment budget cap must be positive and at most $16.")
-        if completion_price not in (3, 4):
+        if cap is not None and (not math.isfinite(cap) or not 0 < cap <= 500):
+            raise JudgeError("Experiment budget cap must be positive and at most $500.")
+        if completion_price not in (3, 4, 10) or prompt_price not in (1, 2):
             raise JudgeError("Unsupported completion price ceiling.")
+        if type(max_output_tokens) is not int or max_output_tokens not in (
+            8192, 16384, 32768, 65536
+        ):
+            raise JudgeError("Unsupported output token ceiling.")
+        if data_collection not in ("deny", "allow"):
+            raise JudgeError("Unsupported provider data policy.")
         if incremental_cap is not None and (
             not math.isfinite(incremental_cap) or incremental_cap <= 0
         ):
@@ -53,6 +97,9 @@ class BudgetBackend:
         self.run_id = uuid4().hex
         self.incremental_cap = incremental_cap
         self.completion_price = completion_price
+        self.prompt_price = prompt_price
+        self.max_output_tokens = max_output_tokens
+        self.data_collection = data_collection
         self.backend, self.ledger = backend, Path(ledger)
         private_directory(self.ledger.parent)
         prepare_private_file(self.ledger)
@@ -61,8 +108,12 @@ class BudgetBackend:
             db.execute(
                 "CREATE TABLE IF NOT EXISTS policy (id INTEGER PRIMARY KEY, cap REAL)"
             )
-            db.execute("INSERT OR IGNORE INTO policy VALUES (1, ?)", (cap,))
-            if db.execute("SELECT cap FROM policy WHERE id=1").fetchone()[0] != cap:
+            db.execute(
+                "INSERT OR IGNORE INTO policy VALUES (1, ?)",
+                (16.0 if cap is None else cap,),
+            )
+            stored_cap = db.execute("SELECT cap FROM policy WHERE id=1").fetchone()[0]
+            if stored_cap <= 0 or (cap is not None and stored_cap != cap):
                 raise JudgeError("Existing budget cap cannot be changed.")
             db.execute(
                 "CREATE TABLE IF NOT EXISTS calls (id INTEGER PRIMARY KEY, reserved REAL, reported REAL, cached INTEGER)"
@@ -74,10 +125,11 @@ class BudgetBackend:
                 db.execute("ALTER TABLE calls ADD COLUMN run_id TEXT")
 
     async def generate(self, req):
-        if type(req.max_tokens) is not int or not 0 < req.max_tokens <= 8192:
-            raise JudgeError(
-                "Budgeted call requires an output limit of 1..8192 tokens."
-            )
+        if (
+            type(req.max_tokens) is not int
+            or not 0 < req.max_tokens <= self.max_output_tokens
+        ):
+            raise JudgeError("Budgeted call exceeds the configured output token limit.")
         if any(not isinstance(m.get("content"), str) for m in req.messages):
             raise JudgeError("Budgeted experiments support text messages only.")
         if req.extra and set(req.extra) - {"response_format", "reasoning"}:
@@ -97,7 +149,12 @@ class BudgetBackend:
             + 4096
         )
         reserved = (
-            2 * (prompt_bound + req.max_tokens * self.completion_price) / 1_000_000
+            2
+            * (
+                prompt_bound * self.prompt_price
+                + req.max_tokens * self.completion_price
+            )
+            / 1_000_000
         )
         with closing(sqlite3.connect(self.ledger)) as db, db:
             db.execute("BEGIN IMMEDIATE")
@@ -118,13 +175,27 @@ class BudgetBackend:
                 "INSERT INTO calls(reserved,run_id) VALUES (?,?)",
                 (reserved, self.run_id),
             ).lastrowid
-        result = await self.backend.generate(
-            with_openrouter_options(req, completion_price=self.completion_price)
+        extra = dict(req.extra or {})
+        extra.update(
+            provider={
+                "max_price": {
+                    "prompt": self.prompt_price,
+                    "completion": self.completion_price,
+                    "request": 0,
+                },
+                "require_parameters": True,
+                "allow_fallbacks": False,
+                "data_collection": self.data_collection,
+            },
+            reasoning=reasoning,
         )
+        result = await self.backend.generate(replace(req, extra=extra))
         cost, cached = None, 0
         if isinstance(result, MinimaLlmResponse):
             cached = int(result.cached)
-            candidate = 0 if cached else (result.raw or {}).get("usage", {}).get("cost")
+            raw = result.raw if isinstance(result.raw, dict) else {}
+            usage = raw.get('usage')
+            candidate = 0 if cached else (usage.get('cost') if isinstance(usage, dict) else None)
             if (
                 type(candidate) in (int, float)
                 and math.isfinite(candidate)

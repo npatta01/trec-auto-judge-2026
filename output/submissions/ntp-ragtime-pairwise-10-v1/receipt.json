@@ -1,0 +1,71 @@
+{
+  "verified_at": "2026-10-08T21:28:42.114280+00:00",
+  "task": "trec-auto-judge",
+  "team": "ntp",
+  "system": "ntp-ragtime-pairwise-10-v1",
+  "track": "ragtime",
+  "dataset": "ragtime26-20260827-test",
+  "data": {
+    "upload_group_id": 2480,
+    "run_id": "2026-10-08-23-17-26",
+    "receipt_verified": true
+  },
+  "code": {
+    "state": "verified",
+    "software_id": 5171,
+    "system": "ntp-ragtime-pairwise-10-v1",
+    "phase": "rename-request",
+    "updated_at": "2026-10-08T21:27:51.337730+00:00",
+    "rename_response_status": 0,
+    "receipt_verified": true,
+    "source_commit": "284040d3684b3d4c68c311773cf927d84ea81cf9",
+    "command": "auto-judge run --workflow /auto-judge/judges/generic/unified-workflow.yml --variant ragtime-pairwise-10 --rag-responses $inputDataset/runs/*/ --rag-topics $inputDataset/topics/*.jsonl --out-dir $outputDir -S run_budget_usd=100 -S pairwise_concurrency=32 -S budget_ledger=/tmp/ntp-budget.sqlite3",
+    "cache_behaviour": "deterministic",
+    "registered_tira_image": "registry.webis.de/code-research/tira/tira-user-ntp/trec-judge:latest-tira-docker-software-id-simmered-auditor",
+    "registered_user_image": "registry.webis.de/code-research/tira/tira-user-ntp/trec-judge:latest",
+    "remote_judge_execution_verified": false,
+    "remote_warm_cache_receipt_verified": false,
+    "mount_config": {
+      "CACHE_DIR": "rw"
+    },
+    "forward_environment_variable_names": [
+      "OPENAI_API_KEY",
+      "OPENAI_BASE_URL",
+      "OPENAI_MODEL"
+    ]
+  },
+  "verification": {
+    "runs": 49,
+    "topics": 103,
+    "score_rows": 5096,
+    "frozen_source_tests_passed": 204,
+    "full_host_replay_byte_identical": true,
+    "synthetic_container_controls_byte_identical": true,
+    "full_container_controls_byte_identical": true,
+    "source_bundle_verified": true,
+    "local_model_endpoint_disabled": true,
+    "workload_network_mode_observed": "bridge",
+    "workload_network_isolated": false,
+    "official_evaluation_values_inspected": false
+  },
+  "budget_snapshot": {
+    "cap_usd": 150.0,
+    "calls": 157641,
+    "reported_usd": 110.367207889,
+    "committed_usd": 122.603991889,
+    "unknown_reservations": 53
+  },
+  "submission_new_paid_calls": 0,
+  "official_score": "not released",
+  "input_binding": {
+    "state": "local_input_binding_verified",
+    "dataset": "ragtime26-20260827-test",
+    "input_directory": "output/budget20/submission-ragtime-preflight-2026-10-08/official-input-layout",
+    "runs": 49,
+    "topics": 103,
+    "source": "official local RAGTIME release, copied without content inspection",
+    "judge_source_changed": false,
+    "archived_failure": "output/budget20/submission-ragtime-preflight-2026-10-08/code-pre-upload-failure-1.json",
+    "remote_registration_occurred_in_failed_attempt": false
+  }
+}
