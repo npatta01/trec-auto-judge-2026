@@ -21,11 +21,19 @@
 \setlength{\intextsep}{8pt plus 1pt}
 \setlength{\abovecaptionskip}{5pt}
 \setlength{\belowcaptionskip}{0pt}
-\hypersetup{pdftitle={Pairwise Preferences and Citation Evidence for TREC AutoJudge 2026},pdfauthor={Nidhin Pattaniyil and Tanwir Zaman}}
+\hypersetup{pdftitle={Pairwise Preferences and Citation Evidence for TREC AutoJudge 2026},pdfauthor={Nidhin Pattaniyil, Tanwir Zaman, and Semih Yagli}}
 \begin{document}
 \begin{center}
 {\Large\bfseries Pairwise Preferences and Citation Evidence\\for TREC AutoJudge 2026\par}
-\vspace{8pt}Nidhin Pattaniyil \quad Tanwir Zaman\\Team: ntp
+\vspace{8pt}
+\begin{tabular}{ccc}
+Nidhin Pattaniyil & Tanwir Zaman & Semih Yagli\\[3pt]
+{\small\href{mailto:npatta01@gmail.com}{\textcolor{blue}{npatta01@gmail.com}}} &
+{\small\href{mailto:zaman.tanwir@gmail.com}{\textcolor{blue}{zaman.tanwir@gmail.com}}} &
+{\small\href{mailto:semihyagli1@gmail.com}{\textcolor{blue}{semihyagli1@gmail.com}}}
+\end{tabular}
+\par\vspace{3pt}
+Independent researchers $\cdot$ Team NP Labs
 \end{center}
 \section*{Abstract}
 We describe three submitted methods for judging answers from the RAG and RAGTIME tracks. \textbf{Pairwise} asks which of two answers is better. \textbf{Evidence} checks whether an answer covers the question and whether its citations support its claims. \textbf{Combined} averages the two scores.
@@ -109,7 +117,7 @@ Average each answer's win chances against the other answers. Then average its sy
 \end{figure}
 \clearpage
 \section{Evidence: check the claim, not just the citation marker}
-The evidence branch builds one question-guided checklist from pooled evidence and freezes it for all answers. It then checks coverage separately from support. Our submitted model identifier is \run{openai/gpt-6-luna}; we did not train a new judge.
+The evidence branch builds one question-guided checklist from pooled evidence and freezes it for all answers. It then checks coverage separately from support. Our submitted model identifier is \run{openai/gpt-6-luna}~\cite{lunacard}; we did not train a new judge.
 
 \begin{figure}[H]\centering
 \includegraphics[width=.68\linewidth]{figures/evidence-side-by-side.png}
@@ -214,7 +222,7 @@ Combined & $(.60+.833)/2\approx\mathbf{.717}$ & $(.60+.875)/2\approx\mathbf{.738
 Evidence averages \textbf{three components for RAG} and \textbf{two for RAGTIME}. Combined gives Pairwise and Evidence equal weight. The assumed .60 is this answer's fitted Pairwise score for this question, not its .75 credit from one pair. For all three methods, a system's score is the mean of its answer scores across questions.
 
 \subsection*{Submitted runs}
-All six runs use \run{openai/gpt-6-luna}. The table gives submission names and data IDs.
+All six runs use \run{openai/gpt-6-luna}~\cite{lunacard}. The table gives submission names and data IDs.
 \begingroup\small
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lYY@{}}\toprule
@@ -230,6 +238,8 @@ Frozen revisions: \run{135b5c6} (RAG Pairwise), \run{284040d} (RAGTIME Pairwise)
 \Needspace{8\baselineskip}
 \begingroup\small\raggedright
 \begin{thebibliography}{9}
+\setlength{\itemsep}{0pt}
+\setlength{\parskip}{0pt}
 \bibitem{ragguidelines} TREC RAG organizers. \href{https://github.com/TREC-RAG/trec-rag-skills/blob/main/skills/trec-rag-2026-track-guidelines/references/rag-task.md}{\emph{RAG 2026 task guidelines: Evaluation}}.
 \bibitem{ragtimeguidelines} TREC RAGTIME organizers. \href{https://docs.google.com/document/d/1XqypNTHxIdazxfnUebrp-EsUuGNhodhQGrJIDnYGaB4/edit}{\emph{RAGTIME 2026 guidelines: Metrics}}.
 \setlength{\itemsep}{0pt}
@@ -237,6 +247,7 @@ Frozen revisions: \run{135b5c6} (RAG Pairwise), \run{284040d} (RAGTIME Pairwise)
 \bibitem{wang} P. Wang et al. \href{https://arxiv.org/abs/2305.17926}{\emph{Large Language Models are not Fair Evaluators}}. 2023.
 \bibitem{zheng} L. Zheng et al. \href{https://arxiv.org/abs/2306.05685}{\emph{Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena}}. 2023.
 
+\bibitem{lunacard} OpenAI. \href{https://deploymentsafety.openai.com/gpt-6-astra/sec:appendix-sol-luna}{\emph{GPT-6 Astra System Card: GPT-6 Sol, GPT-6 Luna}}. 2026.
 \end{thebibliography}
 \endgroup
 \end{document}
