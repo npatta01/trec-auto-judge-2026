@@ -33,6 +33,8 @@ A missing official system is scored as zero before the correlation is computed.
 
 ## Source files
 
-The organizer README, both score tables, both plots, and the circularity
-archive are stored locally under `results/organizer/2026-11-13/` with
-`SHA256SUMS`.
+- [Organizer README](organizer-results/2026-11-13/README.md)
+- RAG [score table](organizer-results/2026-11-13/rag26-scores.tsv) and [plot](organizer-results/2026-11-13/rag26-plot.png)
+- RAGTIME [score table](organizer-results/2026-11-13/ragtime26-scores.tsv) and [plot](organizer-results/2026-11-13/ragtime26-plot.png)
+
+The circularity archive is stored locally under `results/organizer/2026-11-13/`.
