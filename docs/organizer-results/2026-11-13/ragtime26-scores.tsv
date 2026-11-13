@@ -1,0 +1,9 @@
+runtag	llm	eval_measure	tauap_b	top5_overall	top5_gpt-oss-120b	top5_jev
+ntp-combined-v1	gpt-6-luna	RAGTIME_SENTENCE_SUPPORT_PROXY	0.584562	X		
+ntp-combined-v1	gpt-6-luna	RAGTIME_SENTENCE_SUPPORT_PARTIAL_PROXY	0.558222			
+ntp-combined-v1	gpt-6-luna	RAGTIME_EVIDENCE_COMPOSITE_PROXY	0.553361			
+ntp-combined-v1	gpt-6-luna	RAGTIME_GROUNDED_NUGGET_RECALL_ESTIMATE	0.539442			
+ntp-combined-v1	gpt-6-luna	RAGTIME_GROUNDED_COVERAGE_PARTIAL_PROXY	0.379872			
+ntp-combined-v1	gpt-6-luna	RAGTIME_COMBINED_PROXY	0.252738			
+ntp-combined-v1	gpt-6-luna	RAGTIME_PAIRWISE_BLIND_BT_PROXY	-0.009917			
+ntp-pairwise-10-v1	gpt-6-luna	RAGTIME_PAIRWISE_BLIND_BT_PROXY	-0.009917			

@@ -1,0 +1,12 @@
+runtag	llm	eval_measure	tauap_b	top5_overall	top5_gpt-oss-120b	top5_jev
+ntp-combined-v1	gpt-6-luna	RAG_REQUEST_COVERAGE_PROXY	0.573318			
+ntp-combined-v1	gpt-6-luna	RAG_PAIRWISE_BLIND_BT_PROXY	0.505701			
+ntp-pairwise-10-v1	gpt-6-luna	RAG_PAIRWISE_BLIND_BT_PROXY	0.505701			
+ntp-combined-v1	gpt-6-luna	RAG_COMBINED_PROXY	0.496304			
+ntp-combined-v1	gpt-6-luna	RAG_GROUNDED_COVERAGE_PARTIAL_PROXY	0.433537			
+ntp-combined-v1	gpt-6-luna	RAG_EVIDENCE_COMPOSITE_PROXY	0.050418			
+ntp-combined-v1	gpt-6-luna	RAG_GROUNDED_CHECKLIST_RECALL_PROXY	0.009977			
+ntp-combined-v1	gpt-6-luna	RAG_CITATION_RECALL_PARTIAL_PROXY	-0.169184			
+ntp-combined-v1	gpt-6-luna	RAG_CITATION_PRECISION_PARTIAL_PROXY	-0.192315			
+ntp-combined-v1	gpt-6-luna	RAG_CITATION_RECALL_UNWEIGHTED_PROXY	-0.201422			
+ntp-combined-v1	gpt-6-luna	RAG_CITATION_PRECISION_UNWEIGHTED_PROXY	-0.202130			
