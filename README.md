@@ -12,7 +12,7 @@ GPT-6 Luna to both the RAG and RAGTIME tracks, for six confirmed TIRA submission
 
 - [Slides](https://npatta01.github.io/trec-auto-judge-2026/docs/paper/slides/talk.html) — follow the worked example and organizer results. Use **Edit slides** and **Download HTML** to save an editable offline copy.
 - [Notebook paper](https://npatta01.github.io/trec-auto-judge-2026/docs/paper/autojudge2026.pdf) — judging protocol, scoring formulas, and submitted run IDs.
-- [Architecture walkthrough](https://npatta01.github.io/trec-auto-judge-2026/docs/submission-architecture.html) — interactive scoring branches with illustrative submission metadata.
+- [Architecture walkthrough](https://npatta01.github.io/trec-auto-judge-2026/#architecture-walkthrough) — explore the scoring branches and example submission packages on the project site.
 - [Results](https://npatta01.github.io/trec-auto-judge-2026/#results) and [Deep dive](https://npatta01.github.io/trec-auto-judge-2026/#deep-dive) — the track scores, rating fit, and worked answer grades.
 
 ## How the judges work
