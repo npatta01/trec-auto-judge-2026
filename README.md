@@ -15,7 +15,7 @@ GPT-6 Luna to both the RAG and RAGTIME tracks, for six confirmed TIRA submission
 - [Architecture walkthrough](docs/submission-architecture.html) — an interactive
   view of the three approaches, with illustrative submission metadata.
 - [Project landing page](index.html) — open `index.html` from a checkout to
-  browse the talk, paper, architecture, and results in one place.
+  watch the approach video, compare track results, or jump to a detailed slide.
 
 ## How the judges work
 
@@ -46,7 +46,13 @@ This repository builds on the [TREC AutoJudge starter kit](https://github.com/tr
 The [document support workflow](docs/document-pipeline.md) describes the
 citation-scoring code in [`judges/generic/`](judges/generic/). The
 [slide source and build instructions](docs/paper/slides/README.md) explain how to
-rebuild the deck with Quarto.
+rebuild the deck with Quarto. To regenerate the approach video and poster
+from the [storyboard](docs/approach-storyboard.html), use Node.js with Playwright,
+Chromium, and FFmpeg installed.
+
+```bash
+node scripts/render_approach_video.cjs
+```
 
 With Python 3.10+ and `uv`, run the starter kit’s deterministic smoke test on
 the synthetic `kiddie` dataset:

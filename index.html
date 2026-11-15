@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="NP Labs at TREC AutoJudge 2026. Open the editable HTML talk, read the notebook paper, and explore the judging methods and organizer results.">
+  <meta name="description" content="NP Labs at TREC AutoJudge 2026. Watch the judging walkthrough, explore the architecture, and see how the methods scored on RAG and RAGTIME.">
   <title>TREC AutoJudge 2026 · NP Labs</title>
   <link rel="stylesheet" href="docs/assets/project-site.css">
 </head>
@@ -16,10 +16,10 @@
         <span>TREC AutoJudge 2026</span>
       </a>
       <nav aria-label="Project navigation">
-        <a href="docs/paper/slides/talk.html">Talk</a>
-        <a href="docs/paper/autojudge2026.pdf">Paper</a>
-        <a href="docs/submission-architecture.html">Architecture</a>
+        <a href="docs/paper/slides/talk.html">Slides</a>
+        <a href="#architecture">Architecture</a>
         <a href="#results">Results</a>
+        <a href="#deep-dive">Deep dive</a>
         <a href="https://github.com/npatta01/trec-auto-judge-2026">GitHub</a>
       </nav>
     </div>
@@ -31,9 +31,9 @@
         <div>
           <p class="eyebrow">NP Labs · TREC 2026</p>
           <h1 id="hero-title">How should we judge cited answers?</h1>
-          <p class="lede">We tested three ways to score answers and rank the systems that wrote them. Each approach used GPT-6 Luna on TREC’s RAG and RAGTIME tracks.</p>
+          <p class="lede">We tested three ways to score answers and rank the systems that wrote them. We used GPT-6 Luna for all six submissions across TREC’s RAG and RAGTIME tracks.</p>
           <div class="actions">
-            <a class="button primary" href="docs/paper/slides/talk.html">Open editable HTML slides</a>
+            <a class="button primary" href="docs/paper/slides/talk.html">Slides</a>
             <a class="button" href="docs/paper/autojudge2026.pdf">Read the paper</a>
           </div>
         </div>
@@ -42,79 +42,140 @@
       </div>
     </section>
 
+    <section class="section" id="architecture" aria-labelledby="architecture-title">
+      <div class="shell">
+        <h2 id="architecture-title">Architecture</h2>
+        <p class="section-intro">We score each answer two ways. Pairwise judges which answer is better. Evidence grades what each answer covers and what its citations support.</p>
+        <div class="architecture-layout">
+          <figure class="approach-video">
+            <video controls playsinline preload="none" width="1280" height="720"
+                   poster="docs/assets/autojudge-approach-poster.jpg"
+                   aria-label="How AutoJudge ranks systems" aria-describedby="video-caption">
+              <source src="docs/assets/autojudge-approach.mp4" type="video/mp4">
+            </video>
+            <figcaption id="video-caption">
+              <span>34-second walkthrough · Illustrative workweek example</span>
+              <a href="docs/assets/autojudge-approach-poster.jpg">View the diagram</a>
+            </figcaption>
+            <details class="section-details">
+              <summary>Read the video walkthrough</summary>
+              <ol>
+                <li>Given several cited answers to a question, Pairwise compares answers in both orders. In the example, one win and one tie give Answer A 0.75 credit against B. Bradley–Terry fits ratings from the judged pairs.</li>
+                <li>Evidence checks two required items, hours and wellbeing. Answer A covers both. One citation fully supports the hours, and the other supports reduced stress but leaves the profit claim unverified. Their support credits average to 0.75.</li>
+                <li>Combined averages the Pairwise and Evidence scores for each answer. Averaging across questions gives each system a score. The organizers compare the resulting ranking with the official ranking.</li>
+              </ol>
+            </details>
+          </figure>
+          <div class="method-details">
+            <article class="method-detail">
+              <h3>Pairwise</h3>
+              <p>Compare up to ten opponents per answer and judge both presentation orders. When we judge a subset of the pairs, fit a Bradley–Terry model and average each answer’s estimated win chances against every opponent.</p>
+            </article>
+            <article class="method-detail indigo">
+              <h3>Evidence</h3>
+              <p>Pool excerpts from the systems’ citations to generate a reference answer and one checklist per question. Grade checklist coverage and check each answer’s own sources in separate passes.</p>
+            </article>
+            <article class="method-detail green">
+              <h3>Combined</h3>
+              <p>Average the two scores for each answer, with equal weight. Then average scores across questions to rank systems.</p>
+            </article>
+          </div>
+        </div>
+        <details class="section-details">
+          <summary>How the Evidence score differs by track</summary>
+          <dl class="track-details">
+            <div><dt>RAG</dt><dd>Average request coverage, citation precision, and citation recall.</dd></div>
+            <div><dt>RAGTIME</dt><dd>Average grounded factual coverage and partial-credit support from each segment’s first citation.</dd></div>
+          </dl>
+        </details>
+        <ul class="section-links">
+          <li><a href="docs/submission-architecture.html">Interactive architecture</a></li>
+          <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/document-pipeline.md">Document support workflow</a></li>
+          <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/judges/generic">Citation-scoring code</a></li>
+        </ul>
+      </div>
+    </section>
+
     <section class="section" id="results" aria-labelledby="results-title">
       <div class="shell">
-        <h2 id="results-title">Submissions and results</h2>
-        <dl class="facts">
+        <h2 id="results-title">Results</h2>
+        <p class="section-intro">The organizers compared each judge’s system ranking with the host track’s official ranking. The score is rank agreement (<code>tauap_b</code>). A value of 1 means full agreement.</p>
+        <dl class="facts" aria-label="Our best organizer scores">
           <div>
-            <dt>TIRA submissions</dt>
-            <dd><strong>6 confirmed</strong><span>Three approaches across two tracks</span></dd>
+            <dt>RAG · Request coverage alone</dt>
+            <dd><strong>0.573318</strong><span>Against the ranking from human preferences</span></dd>
           </div>
           <div>
-            <dt>RAG</dt>
-            <dd><strong>0.573318</strong><span>Request coverage</span></dd>
-          </div>
-          <div>
-            <dt>RAGTIME</dt>
-            <dd><strong>0.584562</strong><span>Full support from the first citation</span></dd>
+            <dt>RAGTIME · Full support from the first citation</dt>
+            <dd><strong>0.584562</strong><span>Overall top five for our <code>ntp-combined-v1</code> run</span></dd>
           </div>
         </dl>
-        <p class="score-note">These are our best scores for agreement with each track’s official ranking. A <code>tauap_b</code> of 1 means full agreement. The RAGTIME score placed our <code>ntp-combined-v1</code> run in the overall top five.</p>
+        <div class="score-table" tabindex="0" role="region" aria-label="Approach scores by track">
+          <table>
+            <caption>How the three approaches scored</caption>
+            <thead>
+              <tr><th scope="col">Approach</th><th scope="col">RAG</th><th scope="col">RAGTIME</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Pairwise</th><td><strong>0.506</strong></td><td>−0.010</td></tr>
+              <tr><th scope="row">Evidence</th><td>0.050</td><td><strong>0.553</strong></td></tr>
+              <tr><th scope="row">Combined</th><td>0.496</td><td>0.253</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="score-note">The organizer reported all three outputs under <code>ntp-combined-v1</code>. The table rounds their scores to three decimals.</p>
+        <div class="track-details">
+          <div>
+            <h3>RAG</h3>
+            <p>Request coverage alone agreed much more closely with human preferences than the Evidence composite. Citation precision and recall contribute two-thirds of the composite and each had negative rank agreement on its own.</p>
+          </div>
+          <div>
+            <h3>RAGTIME</h3>
+            <p>Evidence had the highest agreement among our three approaches against the official, mostly human F1 ranking. Full support from the first citation alone scored higher still and earned the run’s top-five marker.</p>
+          </div>
+        </div>
+        <ul class="section-links">
+          <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/organizer-results-2026-11-13.md">Organizer results and methodology</a></li>
+          <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/docs/organizer-results/2026-11-13">Released score tables</a></li>
+          <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/submission-ledger.md">TIRA submission ledger</a></li>
+        </ul>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="methods-title">
+    <section class="section" id="deep-dive" aria-labelledby="deep-dive-title">
       <div class="shell">
-        <h2 id="methods-title">Three judging approaches</h2>
+        <h2 id="deep-dive-title">Deep dive</h2>
         <div class="card-grid">
           <article class="card">
-            <h3>Pairwise</h3>
-            <p>Compare pairs of answers in both orders. Fit a Bradley–Terry model to estimate each answer’s win chances.</p>
-          </article>
-          <article class="card indigo">
-            <h3>Evidence</h3>
-            <p>Build one checklist per question. Grade what each answer covers and check how well its citations support it.</p>
-          </article>
-          <article class="card green">
-            <h3>Combined</h3>
-            <p>Give the Pairwise and Evidence scores equal weight, then use the blended scores to rank systems.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="artifacts" aria-labelledby="artifacts-title">
-      <div class="shell">
-        <h2 id="artifacts-title">Project artifacts</h2>
-        <div class="card-grid">
-          <article class="card indigo">
-            <h3>Paper and talk</h3>
-            <p>Follow the four-day-workweek example from an answer pair to its final scores.</p>
+            <h3>From votes to win chances</h3>
+            <p>See why 20 answers give 100 selected pairs, how both presentation orders count, and how fitted ratings score pairs with no direct vote.</p>
             <ul>
-              <li><a href="docs/paper/autojudge2026.pdf">Notebook paper</a></li>
-              <li><a href="docs/paper/slides/talk.html">Conference talk (HTML)</a></li>
-              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/docs/paper/slides">Slide source and build instructions</a></li>
+              <li><a href="docs/paper/slides/talk.html#/pairwise-overview">Pairwise walkthrough</a></li>
+              <li><a href="docs/paper/slides/talk.html#/bradley-terry">Bradley–Terry rating fit</a></li>
             </ul>
           </article>
-          <article class="card">
-            <h3>Architecture and code</h3>
-            <p>Trace each scoring branch in a walkthrough with illustrative submission metadata.</p>
+          <article class="card indigo">
+            <h3>From sources to grades</h3>
+            <p>Follow the reference and checklist. In the workweek example, the answer covers both required items, and one citation earns half credit for supporting only part of its sentence.</p>
             <ul>
-              <li><a href="docs/submission-architecture.html">Interactive architecture</a></li>
-              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/document-pipeline.md">Document support workflow</a></li>
-              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/judges/generic">Citation-scoring code</a></li>
+              <li><a href="docs/paper/slides/talk.html#/coverage">Reference answer and checklist</a></li>
+              <li><a href="docs/paper/slides/talk.html#/answer-grade">Worked answer grade</a></li>
+              <li><a href="docs/paper/slides/talk.html#/track-scores">Track scoring formulas</a></li>
             </ul>
           </article>
           <article class="card amber">
-            <h3>Results and submissions</h3>
-            <p>See how the organizers calculated rank agreement and which submissions went to TIRA.</p>
+            <h3>When the ranking changes</h3>
+            <p>See how a high-coverage system can move down when citation checks enter the score, and which topics and systems the organizers used for their comparison.</p>
             <ul>
-              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/organizer-results-2026-11-13.md">Organizer results and methodology</a></li>
-              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/docs/organizer-results/2026-11-13">Released score tables</a></li>
-              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/submission-ledger.md">TIRA submission ledger</a></li>
+              <li><a href="docs/paper/slides/talk.html#/approach-results">Illustrative ranking change</a></li>
+              <li><a href="docs/paper/slides/talk.html#/meta-evaluation">Organizer evaluation</a></li>
             </ul>
           </article>
         </div>
+        <ul class="section-links">
+          <li><a href="docs/paper/autojudge2026.pdf">Notebook paper</a></li>
+          <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/docs/paper/slides">Slide source and build instructions</a></li>
+        </ul>
       </div>
     </section>
   </main>
