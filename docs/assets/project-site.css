@@ -243,7 +243,7 @@ h3 { font-size: 1.15rem; }
   margin-top: 1.25rem;
 }
 
-.approach-video { margin: 0; }
+.approach-video figure { margin: 0; }
 .approach-video video {
   display: block;
   width: 100%;

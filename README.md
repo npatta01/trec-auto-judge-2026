@@ -22,7 +22,7 @@ GPT-6 Luna to both the RAG and RAGTIME tracks, for six confirmed TIRA submission
 | Approach | How it scores answers |
 | --- | --- |
 | **Pairwise** | Compare selected pairs in both orders. Use Bradley–Terry to estimate each answer’s win chances. |
-| **Evidence** | Build a shared checklist for each question. Grade coverage and citation support separately, then combine the grades using each track’s scoring rules. |
+| **Evidence** | Build a shared checklist for each question. Grade coverage and citation support separately, then combine the grades using our Evidence formula for that track. |
 | **Combined** | Give the Pairwise and Evidence scores equal weight. |
 
 We average each system’s answer scores across questions to rank systems. The
@@ -35,9 +35,11 @@ We average each system’s answer scores across questions to rank systems. The
 | RAG | Request coverage | 0.573318 |
 | RAGTIME | Full support from the first citation | 0.584562 |
 
-A score of 1 means full agreement with the host track’s official ranking. On
-RAGTIME, the top score above placed our `ntp-combined-v1` run in the overall
-top five. See the [organizer results and score tables](docs/organizer-results-2026-11-13.md)
+A score of 1 means full agreement with the host track’s official ranking.
+The reported RAGTIME measure (`RAGTIME_SENTENCE_SUPPORT_PROXY`) scores each
+answer by the fraction of its segments fully supported by their first citation.
+The resulting ranking placed our `ntp-combined-v1` run in the overall top five.
+See the [organizer results and score tables](docs/organizer-results-2026-11-13.md)
 and the [TIRA submission ledger](docs/submission-ledger.md).
 
 ## Development
@@ -47,12 +49,14 @@ The [document support workflow](docs/document-pipeline.md) describes the
 citation-scoring code in [`judges/generic/`](judges/generic/). The
 [slide source and build instructions](docs/paper/slides/README.md) explain how to
 rebuild the deck with Quarto. To regenerate the approach video and poster
-from the [storyboard](docs/approach-storyboard.html), use Node.js with Playwright,
-Chromium, and FFmpeg installed.
+from the [storyboard](docs/approach-storyboard.html), use Node.js with
+Playwright’s Chromium and FFmpeg with `libx264` support.
 
 ```bash
 node scripts/render_approach_video.cjs
 ```
+
+For a system Chromium, set `CHROMIUM_PATH` to its executable.
 
 With Python 3.10+ and `uv`, run the starter kit’s deterministic smoke test on
 the synthetic `kiddie` dataset:

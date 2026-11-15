@@ -47,16 +47,18 @@
         <h2 id="architecture-title">Architecture</h2>
         <p class="section-intro">We score each answer two ways. Pairwise judges which answer is better. Evidence grades what each answer covers and what its citations support.</p>
         <div class="architecture-layout">
-          <figure class="approach-video">
-            <video controls playsinline preload="none" width="1280" height="720"
-                   poster="docs/assets/autojudge-approach-poster.jpg"
-                   aria-label="How AutoJudge ranks systems" aria-describedby="video-caption">
-              <source src="docs/assets/autojudge-approach.mp4" type="video/mp4">
-            </video>
-            <figcaption id="video-caption">
-              <span>34-second walkthrough · Illustrative workweek example</span>
-              <a href="docs/assets/autojudge-approach-poster.jpg">View the diagram</a>
-            </figcaption>
+          <div class="approach-video">
+            <figure>
+              <video controls playsinline preload="none" width="1280" height="720"
+                     poster="docs/assets/autojudge-approach-poster.jpg"
+                     aria-label="How AutoJudge ranks systems" aria-describedby="video-caption">
+                <source src="docs/assets/autojudge-approach.mp4" type="video/mp4">
+              </video>
+              <figcaption id="video-caption">
+                <span>34-second walkthrough · Illustrative workweek example</span>
+                <a href="docs/assets/autojudge-approach-poster.jpg">View the diagram</a>
+              </figcaption>
+            </figure>
             <details class="section-details">
               <summary>Read the video walkthrough</summary>
               <ol>
@@ -65,7 +67,7 @@
                 <li>Combined averages the Pairwise and Evidence scores for each answer. Averaging across questions gives each system a score. The organizers compare the resulting ranking with the official ranking.</li>
               </ol>
             </details>
-          </figure>
+          </div>
           <div class="method-details">
             <article class="method-detail">
               <h3>Pairwise</h3>
@@ -131,7 +133,7 @@
           </div>
           <div>
             <h3>RAGTIME</h3>
-            <p>Evidence had the highest agreement among our three approaches against the official, mostly human F1 ranking. Full support from the first citation alone scored higher still and earned the run’s top-five marker.</p>
+            <p>Evidence had the highest agreement of our three approaches with the official F1 ranking, which uses mostly human assessments. Our best individual measure scores each answer by the fraction of its segments fully supported by their first citation. <a href="docs/paper/slides/talk.html#/ragtime-measures">See how sentence support is counted</a>.</p>
           </div>
         </div>
         <ul class="section-links">
