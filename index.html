@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NP Labs at TREC AutoJudge 2026. Open the editable HTML talk, read the notebook paper, and explore the judging methods and organizer results.">
+  <title>TREC AutoJudge 2026 · NP Labs</title>
+  <link rel="stylesheet" href="docs/assets/project-site.css">
+</head>
+<body id="top">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">NP</span>
+        <span>TREC AutoJudge 2026</span>
+      </a>
+      <nav aria-label="Project navigation">
+        <a href="docs/paper/slides/talk.html">Talk</a>
+        <a href="docs/paper/autojudge2026.pdf">Paper</a>
+        <a href="docs/submission-architecture.html">Architecture</a>
+        <a href="#results">Results</a>
+        <a href="https://github.com/npatta01/trec-auto-judge-2026">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="shell hero-layout">
+        <div>
+          <p class="eyebrow">NP Labs · TREC 2026</p>
+          <h1 id="hero-title">How should we judge cited answers?</h1>
+          <p class="lede">We tested three ways to score answers and rank the systems that wrote them. Each approach used GPT-6 Luna on TREC’s RAG and RAGTIME tracks.</p>
+          <div class="actions">
+            <a class="button primary" href="docs/paper/slides/talk.html">Open editable HTML slides</a>
+            <a class="button" href="docs/paper/autojudge2026.pdf">Read the paper</a>
+          </div>
+        </div>
+        <img class="hero-art" src="docs/paper/slides/art/autojudge-cover.webp"
+             width="1881" height="836" alt="An illustrated judging station examines an answer sheet beside a stack of ranked results.">
+      </div>
+    </section>
+
+    <section class="section" id="results" aria-labelledby="results-title">
+      <div class="shell">
+        <h2 id="results-title">Submissions and results</h2>
+        <dl class="facts">
+          <div>
+            <dt>TIRA submissions</dt>
+            <dd><strong>6 confirmed</strong><span>Three approaches across two tracks</span></dd>
+          </div>
+          <div>
+            <dt>RAG</dt>
+            <dd><strong>0.573318</strong><span>Request coverage</span></dd>
+          </div>
+          <div>
+            <dt>RAGTIME</dt>
+            <dd><strong>0.584562</strong><span>Full support from the first citation</span></dd>
+          </div>
+        </dl>
+        <p class="score-note">These are our best scores for agreement with each track’s official ranking. A <code>tauap_b</code> of 1 means full agreement. The RAGTIME score placed our <code>ntp-combined-v1</code> run in the overall top five.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="methods-title">
+      <div class="shell">
+        <h2 id="methods-title">Three judging approaches</h2>
+        <div class="card-grid">
+          <article class="card">
+            <h3>Pairwise</h3>
+            <p>Compare pairs of answers in both orders. Fit a Bradley–Terry model to estimate each answer’s win chances.</p>
+          </article>
+          <article class="card indigo">
+            <h3>Evidence</h3>
+            <p>Build one checklist per question. Grade what each answer covers and check how well its citations support it.</p>
+          </article>
+          <article class="card green">
+            <h3>Combined</h3>
+            <p>Give the Pairwise and Evidence scores equal weight, then use the blended scores to rank systems.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="artifacts" aria-labelledby="artifacts-title">
+      <div class="shell">
+        <h2 id="artifacts-title">Project artifacts</h2>
+        <div class="card-grid">
+          <article class="card indigo">
+            <h3>Paper and talk</h3>
+            <p>Follow the four-day-workweek example from an answer pair to its final scores.</p>
+            <ul>
+              <li><a href="docs/paper/autojudge2026.pdf">Notebook paper</a></li>
+              <li><a href="docs/paper/slides/talk.html">Conference talk (HTML)</a></li>
+              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/docs/paper/slides">Slide source and build instructions</a></li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Architecture and code</h3>
+            <p>Trace each scoring branch in a walkthrough with illustrative submission metadata.</p>
+            <ul>
+              <li><a href="docs/submission-architecture.html">Interactive architecture</a></li>
+              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/document-pipeline.md">Document support workflow</a></li>
+              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/judges/generic">Citation-scoring code</a></li>
+            </ul>
+          </article>
+          <article class="card amber">
+            <h3>Results and submissions</h3>
+            <p>See how the organizers calculated rank agreement and which submissions went to TIRA.</p>
+            <ul>
+              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/organizer-results-2026-11-13.md">Organizer results and methodology</a></li>
+              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/tree/main/docs/organizer-results/2026-11-13">Released score tables</a></li>
+              <li><a href="https://github.com/npatta01/trec-auto-judge-2026/blob/main/docs/submission-ledger.md">TIRA submission ledger</a></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <p>NP Labs · Nidhin Pattaniyil, Tanwir Zaman, and Semih Yagli</p>
+    <nav aria-label="Project references">
+      <a href="https://github.com/trec-auto-judge/.github/blob/main/profile/howto/README.md">Participant guide</a>
+      <a href="https://trec-auto-judge.cs.unh.edu/">TREC AutoJudge</a>
+    </nav>
+  </footer>
+</body>
+</html>
