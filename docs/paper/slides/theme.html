@@ -1,0 +1,47 @@
+<script>
+(() => {
+  if (new URLSearchParams(location.search).has("print-pdf")) return;
+
+  const themes = ["Auto", "Dark", "Light", "Storybook"];
+  const themeKey = "trec-autojudge-theme";
+  const root = document.documentElement;
+  let index = 0;
+  try {
+    index = Math.max(0, themes.indexOf(localStorage.getItem(themeKey)));
+  } catch {
+    // The theme still works if the browser blocks storage for local files.
+  }
+
+  function setPalette() {
+    root.dataset.theme = themes[index].toLowerCase();
+  }
+  setPalette();
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const toolbar = document.createElement("div");
+    toolbar.className = "deck-tools";
+    toolbar.setAttribute("role", "group");
+    toolbar.setAttribute("aria-label", "Slide controls");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "theme-toggle";
+
+    function setLabel() {
+      button.textContent = themes[index];
+      button.setAttribute("aria-label", "Theme: " + themes[index]);
+      button.title = "Change theme";
+    }
+
+    setLabel();
+    button.addEventListener("click", () => {
+      index = (index + 1) % themes.length;
+      setPalette();
+      setLabel();
+      try { localStorage.setItem(themeKey, themes[index]); } catch { /* optional preference */ }
+    });
+
+    toolbar.append(button);
+    document.body.prepend(toolbar);
+  });
+})();
+</script>

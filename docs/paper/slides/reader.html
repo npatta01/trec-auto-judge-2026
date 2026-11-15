@@ -1,0 +1,86 @@
+<script>
+(() => {
+  const initialHash = location.hash;
+  document.addEventListener("DOMContentLoaded", () => {
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    viewportMeta?.setAttribute("content", "width=device-width, initial-scale=1");
+    if (new URLSearchParams(location.search).has("print-pdf")) return;
+
+    const narrowViewport = window.matchMedia("(max-width: 800px)");
+    const reveal = window.Reveal;
+    let reader;
+
+    function setReaderContent(section, slide) {
+      section.replaceChildren(...Array.from(slide.childNodes, (node) => node.cloneNode(true)));
+      for (const node of section.querySelectorAll(".notes, .slide-background")) {
+        node.remove();
+      }
+      for (const link of section.querySelectorAll('.roadmap a[href^="#"]')) {
+        link.setAttribute("href", "#read-" + link.getAttribute("href").slice(1));
+      }
+      if (slide.id === "cover") {
+        const title = section.querySelector("h2");
+        const heading = document.createElement("h1");
+        heading.textContent = title.textContent;
+        title.replaceWith(heading);
+      }
+    }
+
+    function buildReader() {
+      const main = document.createElement("main");
+      main.className = "reader";
+      main.id = "slide-reader";
+
+      const nav = document.createElement("nav");
+      nav.setAttribute("aria-label", "Jump to a section");
+      nav.innerHTML = '<ul><li><a href="#read-task">Task</a></li><li><a href="#read-workweek">Example</a></li><li><a href="#read-results">Results</a></li><li><a href="#read-appendix-section">Appendix</a></li></ul>';
+      main.append(nav);
+
+      for (const slide of reveal.getSlides()) {
+        const copy = document.createElement("section");
+        copy.className = slide.className;
+        copy.id = "read-" + slide.id;
+        setReaderContent(copy, slide);
+        main.append(copy);
+      }
+      document.body.append(main);
+      return main;
+    }
+
+    function updateView() {
+      const showReader = narrowViewport.matches;
+      if (showReader && !reader) reader = buildReader();
+      document.documentElement.classList.toggle("reader-mode", showReader);
+      reveal.configure({
+        keyboard: !showReader,
+        touch: !showReader,
+        hash: !showReader,
+        history: !showReader,
+      });
+    }
+
+    function start() {
+      updateView();
+      if (narrowViewport.matches && initialHash) {
+        const slideId = initialHash.startsWith("#read-")
+          ? initialHash.slice(1)
+          : "read-" + initialHash.replace(/^#\/?/, "");
+        const target = document.getElementById(slideId);
+        if (target) {
+          history.replaceState(null, "", "#" + slideId);
+          target.scrollIntoView();
+        }
+      }
+      narrowViewport.addEventListener("change", updateView);
+    }
+
+    document.addEventListener("autojudge-slide-edited", ({ detail: slide }) => {
+      const section = document.getElementById("read-" + slide.id);
+      if (section) setReaderContent(section, slide);
+    });
+
+    if (reveal.isReady()) start();
+    else reveal.on("ready", start);
+  });
+})();
+</script>

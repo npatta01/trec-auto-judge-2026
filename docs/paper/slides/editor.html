@@ -1,0 +1,257 @@
+<script>
+(() => {
+  if (new URLSearchParams(location.search).has("print-pdf")) return;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const reveal = window.Reveal;
+    const deckScripts = Array.from(document.body.children).filter((node) => node.tagName === "SCRIPT");
+
+    function startEditor() {
+      const slides = reveal.getSlides();
+      const launch = document.createElement("button");
+      launch.type = "button";
+      launch.className = "slide-edit-launch";
+      launch.textContent = "Edit slides";
+
+      const dialog = document.createElement("dialog");
+      dialog.className = "slide-editor";
+      dialog.setAttribute("aria-labelledby", "slide-edit-heading");
+      dialog.innerHTML = '<div class="slide-edit-toolbar">'
+        + '<h2 id="slide-edit-heading">Edit slides</h2>'
+        + '<label for="slide-edit-choice">Slide</label>'
+        + '<select id="slide-edit-choice"></select>'
+        + '<div class="slide-edit-actions"><button type="button" data-action="done">Done</button>'
+        + '<button type="button" data-action="download">Download HTML</button></div></div>'
+        + '<div class="slide-edit-scroll"><p class="slide-edit-help">Click outlined text to edit it. Download HTML to keep your changes.</p>'
+        + '<p class="slide-edit-status" role="status" hidden></p>'
+        + '<div class="slide-edit-preview reader" aria-label="Slide content"></div>'
+        + '<details class="slide-edit-notes"><summary>Speaker notes</summary></details></div>';
+      document.querySelector(".deck-tools").prepend(launch);
+      document.body.append(dialog);
+
+      const choice = dialog.querySelector("select");
+      const preview = dialog.querySelector(".slide-edit-preview");
+      const notes = dialog.querySelector(".slide-edit-notes");
+      const status = dialog.querySelector(".slide-edit-status");
+      const scroll = dialog.querySelector(".slide-edit-scroll");
+      const fields = [
+        "h2", "h3:not(.result-panel h3)", "p:not(.source-links)", ".source-links a",
+        ".prompt", "th", "td", ".step-label", ".flow strong", ".equation strong",
+        ".arithmetic", ".blend-term > *", ".result-panel h3 > span", ".score-label > span", ".score-label > strong",
+        ".ring > :not([aria-hidden])", ".roadmap-label", ".judge-flow li", ".closing-methods li",
+      ].join(", ");
+      let selected;
+      let dirty;
+      let keyboardEnabled;
+      let touchEnabled;
+
+      function showStatus(message) {
+        status.hidden = !message;
+        status.textContent = message;
+      }
+
+      function slideTitle(slide) {
+        return slide.querySelector("h2")?.textContent.trim() || "Untitled slide";
+      }
+
+      function showSlide(slide) {
+        selected = slide;
+        dirty = false;
+        choice.value = slide.id;
+        const copy = slide.cloneNode(true);
+        notes.querySelector("aside")?.remove();
+        const speakerNotes = copy.querySelector("aside.notes") || document.createElement("aside");
+        speakerNotes.className = "notes";
+        if (!speakerNotes.querySelector("p")) speakerNotes.append(document.createElement("p"));
+        notes.append(speakerNotes);
+        notes.open = false;
+        preview.classList.toggle("editing-cover", slide.id === "cover");
+        preview.replaceChildren(...copy.childNodes);
+        const editableFields = preview.querySelectorAll(fields);
+        for (const field of [...editableFields, ...speakerNotes.querySelectorAll("p")]) {
+          if (field.parentElement.closest(fields)) continue;
+          field.contentEditable = "plaintext-only";
+          if (field.matches(".score-label > strong")) {
+            field.setAttribute("role", "textbox");
+            field.setAttribute("aria-label", field.previousElementSibling.textContent.trim() + " score");
+            field.setAttribute("inputmode", "decimal");
+          }
+        }
+        showStatus("");
+      }
+
+      function updateChart() {
+        const chart = preview.querySelector(".result-grid");
+        if (!chart) return true;
+
+        const scores = Array.from(chart.querySelectorAll(".score-label strong"), (field) => {
+          const text = field.textContent.trim().replaceAll("−", "-");
+          const value = Number(text);
+          const valid = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text) && value >= -1 && value <= 1;
+          field.setAttribute("aria-invalid", String(!valid));
+          return { field, value, text, valid };
+        });
+        if (scores.some((score) => !score.valid)) return false;
+
+        const values = scores.map((score) => score.value);
+        const chartMin = Math.min(-0.1, Math.floor(Math.min(...values) * 10) / 10);
+        const chartMax = Math.max(0.6, Math.ceil(Math.max(...values) * 10) / 10);
+        const unit = 100 / (chartMax - chartMin);
+        const position = (value) => (value - chartMin) * unit + "%";
+        const midpoint = chartMax / 2;
+        const label = (value) => String(value).replace("-", "−");
+
+        chart.style.setProperty("--chart-zero", position(0));
+        chart.style.setProperty("--chart-unit", unit + "%");
+        for (const { field, value } of scores) {
+          const bar = field.parentElement.nextElementSibling.querySelector("i");
+          bar.style.setProperty("--value", String(Math.abs(value)));
+          bar.classList.toggle("negative", value < 0);
+        }
+        for (const axis of chart.querySelectorAll(".scale")) {
+          axis.children[0].textContent = label(chartMin);
+          axis.children[2].textContent = label(midpoint);
+          axis.children[2].style.left = position(midpoint);
+          axis.children[3].textContent = label(chartMax);
+        }
+        return true;
+      }
+
+      function cleanContent(container) {
+        const copy = container.cloneNode(true);
+        for (const field of copy.querySelectorAll("[contenteditable]")) {
+          field.removeAttribute("contenteditable");
+          if (field.matches(".score-label > strong")) {
+            field.textContent = field.textContent.trim().replace(/^-/, "−");
+            for (const attribute of ["role", "aria-label", "aria-invalid", "inputmode"]) {
+              field.removeAttribute(attribute);
+            }
+          }
+          // Browsers can insert block elements for newlines inside a text field.
+          for (const line of field.querySelectorAll("div, p")) {
+            line.replaceWith(document.createElement("br"), ...line.childNodes);
+          }
+        }
+        return copy;
+      }
+
+      function applyChanges() {
+        if (!dirty) return true;
+        if (!updateChart()) {
+          showStatus("Enter a chart score from −1 to 1.");
+          preview.querySelector('[aria-invalid="true"]').focus();
+          return false;
+        }
+        const content = cleanContent(preview);
+        const speakerNotes = cleanContent(notes.querySelector("aside"));
+        selected.replaceChildren(...content.childNodes);
+        const noteParagraphs = Array.from(speakerNotes.querySelectorAll("p"));
+        if (noteParagraphs.some((paragraph) => paragraph.textContent.trim())) selected.append(speakerNotes);
+        choice.selectedOptions[0].textContent = (slides.indexOf(selected) + 1) + ". " + slideTitle(selected);
+        dirty = false;
+        document.dispatchEvent(new CustomEvent("autojudge-slide-edited", { detail: selected }));
+        return true;
+      }
+
+      function selectSlide() {
+        const next = slides.find((slide) => slide.id === choice.value);
+        choice.value = selected.id;
+        if (applyChanges()) {
+          showSlide(next);
+          scroll.scrollTop = 0;
+        }
+      }
+
+      function finish() {
+        if (!applyChanges()) return;
+        dialog.close();
+        reveal.configure({ keyboard: keyboardEnabled, touch: touchEnabled });
+        launch.focus({ preventScroll: true });
+        const readerSlide = document.getElementById("read-" + selected.id);
+        if (document.documentElement.classList.contains("reader-mode") && readerSlide) {
+          history.replaceState(null, "", "#" + readerSlide.id);
+          readerSlide.scrollIntoView();
+        } else {
+          reveal.sync();
+          reveal.slide(slides.indexOf(selected));
+        }
+      }
+
+      function download() {
+        if (!applyChanges()) return;
+
+        // Rebuild the static deck so Reveal recreates its controls on load.
+        const output = document.implementation.createHTMLDocument();
+        output.documentElement.lang = document.documentElement.lang;
+        output.documentElement.replaceChild(output.importNode(document.head, true), output.head);
+        output.title = slideTitle(slides[0]);
+        const wrapper = output.createElement("div");
+        wrapper.className = "reveal";
+        const slideList = output.createElement("div");
+        slideList.className = "slides";
+        for (const slide of slides) {
+          const copy = output.importNode(slide, true);
+          copy.classList.remove("past", "present", "future", "stack");
+          for (const attribute of ["style", "aria-hidden", "hidden", "inert"]) {
+            copy.removeAttribute(attribute);
+          }
+          slideList.append(copy);
+        }
+        wrapper.append(slideList);
+        output.body.append(wrapper, ...deckScripts.map((script) => output.importNode(script, true)));
+
+        const file = new Blob(["<!doctype html>\n", output.documentElement.outerHTML], {
+          type: "text/html;charset=utf-8",
+        });
+        const url = URL.createObjectURL(file);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "trec-autojudge-2026-edited.html";
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        showStatus("HTML downloaded. Open the downloaded file to continue editing.");
+      }
+
+      launch.addEventListener("click", () => {
+        keyboardEnabled = reveal.getConfig().keyboard;
+        touchEnabled = reveal.getConfig().touch;
+        reveal.configure({ keyboard: false, touch: false });
+        let slide = reveal.getCurrentSlide();
+        if (document.documentElement.classList.contains("reader-mode")) {
+          const sections = Array.from(document.querySelectorAll("#slide-reader > section"));
+          const visible = sections.findLast((section) => section.getBoundingClientRect().top <= 85);
+          slide = slides.find((entry) => "read-" + entry.id === visible?.id) || slides[0];
+        }
+        choice.replaceChildren(...slides.map((entry, index) =>
+          new Option((index + 1) + ". " + slideTitle(entry), entry.id)
+        ));
+        showSlide(slide);
+        dialog.showModal();
+        scroll.scrollTop = 0;
+        choice.focus();
+      });
+      choice.addEventListener("change", selectSlide);
+      dialog.querySelector('[data-action="done"]').addEventListener("click", finish);
+      dialog.querySelector('[data-action="download"]').addEventListener("click", download);
+      dialog.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        finish();
+      });
+      dialog.addEventListener("click", (event) => {
+        if (event.target.closest("a")) event.preventDefault();
+      });
+      scroll.addEventListener("input", (event) => {
+        dirty = true;
+        if (event.target.matches(".score-label strong")) {
+          showStatus(updateChart() ? "" : "Enter a chart score from −1 to 1.");
+        }
+      });
+    }
+
+    if (reveal.isReady()) startEditor();
+    else reveal.on("ready", startEditor);
+  });
+})();
+</script>
