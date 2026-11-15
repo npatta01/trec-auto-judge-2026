@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>How AutoJudge ranks systems · Video source</title>
+  <style>
+    :root {
+      --paper: #faf2e1;
+      --panel: #fffaf0;
+      --ink: #102e31;
+      --muted: #365456;
+      --line: #d7cdb6;
+      --teal: #08675f;
+      --teal-soft: #d9efea;
+      --indigo: #4e459b;
+      --indigo-soft: #eee9fb;
+      --amber: #875210;
+      --amber-soft: #f7e5bc;
+      font-family: Inter, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      width: 1280px;
+      height: 720px;
+      padding: 40px 55px 36px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 22px;
+      overflow: hidden;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    [hidden] { display: none !important; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2 { font-size: 57px; letter-spacing: -.045em; line-height: 1.05; }
+    h3 { font-size: 37px; line-height: 1.12; }
+    p { line-height: 1.3; }
+    header {
+      color: var(--teal);
+      font-size: 22px;
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    main { min-height: 0; }
+    .scene {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 17px;
+    }
+    .intro { color: var(--muted); font-size: 32px; }
+    .overview-flow {
+      display: grid;
+      grid-template-columns: 1fr 54px 1.18fr 54px 1fr;
+      align-items: center;
+      flex: 1;
+      min-height: 0;
+    }
+    .flow-node {
+      display: grid;
+      gap: 10px;
+      padding: 23px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+    }
+    .flow-node p { color: var(--muted); font-size: 27px; }
+    .branch-stack { display: grid; gap: 14px; }
+    .teal { background: var(--teal-soft); border-color: var(--teal); }
+    .indigo { background: var(--indigo-soft); border-color: var(--indigo); }
+    .amber { background: var(--amber-soft); border-color: var(--amber); }
+    .arrow {
+      display: grid;
+      place-items: center;
+      color: var(--teal);
+      font-size: 51px;
+      font-weight: 800;
+    }
+    .answer-art, .rank-art {
+      justify-self: center;
+      display: block;
+      width: 160px;
+      height: 126px;
+      object-fit: contain;
+    }
+    .pair-deck { position: relative; height: 154px; margin-top: 5px; }
+    .answer {
+      position: absolute;
+      top: 0;
+      width: 48.4%;
+      min-height: 145px;
+      padding: 19px 22px;
+      border: 2px solid;
+      border-radius: 15px;
+    }
+    .answer span { display: block; margin-top: 7px; color: var(--muted); font-size: 27px; }
+    .answer.teal { border-color: var(--teal); }
+    .answer.indigo { border-color: var(--indigo); }
+    #answer-a { left: calc(var(--swap, 0) * 51.6%); transform: translateY(var(--lift, 0px)); z-index: 1; }
+    #answer-b { left: calc((1 - var(--swap, 0)) * 51.6%); transform: translateY(calc(-1 * var(--lift, 0px))); }
+    .votes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 2px;
+    }
+    .votes p, .pair-credit {
+      padding: 13px 19px;
+      border-radius: 10px;
+      background: var(--panel);
+      border: 2px solid var(--line);
+      font-size: 30px;
+    }
+    .pair-credit strong { color: var(--teal); }
+    .small-note { color: var(--muted); font-size: 27px; }
+    .answer-line {
+      padding: 16px 21px;
+      border-left: 6px solid var(--teal);
+      background: var(--panel);
+      font-size: 32px;
+    }
+    mark {
+      padding: 0 4px;
+      border-radius: 4px;
+      background: transparent;
+      color: inherit;
+    }
+    .show-hours #hours, .show-stress #stress { background: var(--teal-soft); }
+    .show-stress #profits { background: var(--amber-soft); }
+    .evidence-grid, .combine-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+    .measure-card {
+      padding: 19px 21px;
+      border: 2px solid;
+      border-radius: 14px;
+    }
+    .measure-card.teal { border-color: var(--teal); }
+    .measure-card.indigo { border-color: var(--indigo); }
+    .measure-card p { margin-top: 9px; font-size: 30px; }
+    .measure-card strong { font-variant-numeric: tabular-nums; }
+    .measure-total {
+      padding-top: 9px;
+      border-top: 1px solid var(--line);
+      font-weight: 800;
+    }
+    .combine-grid {
+      position: relative;
+      gap: 23px;
+      align-items: stretch;
+    }
+    .combine-grid .measure-card { padding-block: 23px; }
+    .merge-equation {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      margin-top: 9px;
+      padding: 16px 22px;
+      background: var(--amber-soft);
+      border: 2px solid var(--amber);
+      border-radius: 14px;
+      font-size: 32px;
+    }
+    .merge-equation strong { font-size: 39px; }
+    .system-rank {
+      display: flex;
+      align-items: center;
+      gap: 23px;
+      font-size: 32px;
+    }
+    .system-rank img { width: 126px; height: 126px; object-fit: contain; }
+    .system-rank span { color: var(--muted); }
+    footer {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      padding-top: 13px;
+      border-top: 2px solid var(--line);
+      color: var(--muted);
+      font-size: 21px;
+      font-weight: 650;
+    }
+    .progress { flex: 1; height: 5px; border-radius: 4px; background: var(--line); }
+    .progress span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--teal);
+      transform: scaleX(var(--progress, 0));
+      transform-origin: left;
+    }
+  </style>
+</head>
+<body>
+  <header>NP Labs · TREC AutoJudge 2026</header>
+  <main>
+    <section class="scene" id="overview">
+      <h1>How AutoJudge ranks systems</h1>
+      <p class="intro">One question. Two ways to score its answers.</p>
+      <div class="overview-flow">
+        <div class="flow-node" id="start">
+          <img class="answer-art" src="paper/slides/art/cited-answers.webp" width="1254" height="1254" alt="">
+          <h3>Cited answers</h3>
+          <p>Several systems answer the same question.</p>
+        </div>
+        <span class="arrow" id="split-arrow" aria-hidden="true">→</span>
+        <div class="branch-stack">
+          <div class="flow-node teal" id="pairwise-node">
+            <h3>Pairwise</h3>
+            <p>Which answer is better?</p>
+          </div>
+          <div class="flow-node indigo" id="evidence-node">
+            <h3>Evidence</h3>
+            <p>What does it cover? Do its sources support it?</p>
+          </div>
+        </div>
+        <span class="arrow" id="merge-arrow" aria-hidden="true">→</span>
+        <div class="flow-node amber" id="combined-node">
+          <img class="rank-art" src="paper/slides/art/system-ranking.webp" width="1254" height="1254" alt="">
+          <h3>Combined</h3>
+          <p>Blend the two scores and rank the systems.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene" id="pairwise" hidden>
+      <h2>Pairwise compares both orders</h2>
+      <p class="intro">How does a four-day workweek change hours and wellbeing?</p>
+      <div class="pair-deck">
+        <article class="answer teal" id="answer-a"><h3>Answer A</h3><span>32 hours a week, less stress and double profits</span></article>
+        <article class="answer indigo" id="answer-b"><h3>Answer B</h3><span>More time off</span></article>
+      </div>
+      <div class="votes">
+        <p id="first-vote"><strong>A then B</strong> · A wins</p>
+        <p id="second-vote"><strong>B then A</strong> · Tie</p>
+      </div>
+      <p class="pair-credit" id="pair-credit">A’s credit vs B <strong>(1 + 0.5) / 2 = 0.75</strong></p>
+      <p class="small-note" id="pair-note">Bradley–Terry fits ratings from the judged pairs.</p>
+    </section>
+
+    <section class="scene" id="evidence" hidden>
+      <h2>Evidence checks claims and citations</h2>
+      <p class="answer-line"><mark id="hours">32 hours a week [1]</mark>. <mark id="stress">Less stress</mark> and <mark id="profits">double profits</mark> [2].</p>
+      <div class="evidence-grid">
+        <article class="measure-card teal" id="coverage-card">
+          <h3>Checklist coverage</h3>
+          <p>✓ Hours</p>
+          <p>✓ Wellbeing</p>
+          <p class="measure-total">Both covered · 1.00</p>
+        </article>
+        <article class="measure-card indigo" id="citation-card">
+          <h3>Citation support</h3>
+          <p><strong>[1] 1.0</strong> · Supports the hours</p>
+          <p id="partial"><strong>[2] 0.5</strong> · Supports stress only</p>
+          <p class="measure-total" id="citation-total">Mean support · 0.75</p>
+        </article>
+      </div>
+      <p class="small-note" id="evidence-note">The source gives no support for the profit claim.</p>
+    </section>
+
+    <section class="scene" id="combined" hidden>
+      <h2>Combined blends the answer scores</h2>
+      <div class="combine-grid">
+        <article class="measure-card teal" id="combine-pairwise"><h3>Pairwise score</h3><p>Weight <strong>50%</strong></p></article>
+        <article class="measure-card indigo" id="combine-evidence"><h3>Evidence score</h3><p>Weight <strong>50%</strong></p></article>
+      </div>
+      <p class="merge-equation" id="merge-score"><strong>Combined</strong> Half of each score for the answer</p>
+      <div class="system-rank" id="system-rank">
+        <img src="paper/slides/art/system-ranking.webp" width="1254" height="1254" alt="">
+        <p><strong>Rank the systems</strong><br><span>Average each system’s scores across questions.</span></p>
+      </div>
+      <p class="small-note" id="rank-note">The organizers compare that ranking with the official one.</p>
+    </section>
+  </main>
+  <footer>
+    <span>Illustrative workweek example</span>
+    <div class="progress" id="progress" aria-hidden="true"><span></span></div>
+  </footer>
+  <script>
+    const byId = (id) => document.getElementById(id);
+    const scenes = [...document.querySelectorAll(".scene")];
+    const startTimes = [0, 6, 15, 25];
+    const duration = 34;
+    const progress = byId("progress");
+    const smooth = (time) => {
+      const t = Math.min(1, Math.max(0, time));
+      return t * t * (3 - 2 * t);
+    };
+
+    // The renderer samples this timeline rather than using a real-time clock.
+    window.approachDuration = duration;
+    window.renderApproach = (seconds, poster = false) => {
+      const sceneIndex = startTimes.findLastIndex((start) => seconds >= start);
+      const time = seconds - startTimes[sceneIndex];
+      const frame = [sceneIndex];
+      scenes.forEach((scene, index) => { scene.hidden = index !== sceneIndex; });
+      if (poster) {
+        progress.hidden = true;
+      } else {
+        progress.hidden = false;
+        // Move one step every quarter-second so reading pauses reuse frames.
+        const fraction = Math.floor(seconds * 4) / (duration * 4);
+        progress.style.setProperty("--progress", fraction);
+        frame.push(fraction);
+      }
+
+      const reveal = (id, start) => {
+        const amount = poster ? 1 : smooth((time - start) / .48);
+        const item = byId(id);
+        item.style.opacity = amount;
+        item.style.transform = "translateY(" + 12 * (1 - amount) + "px)";
+        frame.push(amount);
+      };
+
+      if (sceneIndex === 0) {
+        reveal("split-arrow", .65);
+        reveal("pairwise-node", .8);
+        reveal("evidence-node", 1.25);
+        reveal("merge-arrow", 1.9);
+        reveal("combined-node", 2.05);
+      } else if (sceneIndex === 1) {
+        const swap = smooth((time - 2.8) / 1.15);
+        const deck = byId("answer-a").parentElement;
+        deck.style.setProperty("--swap", swap);
+        deck.style.setProperty("--lift", -48 * Math.sin(Math.PI * swap) + "px");
+        frame.push(swap);
+        reveal("first-vote", .75);
+        reveal("second-vote", 4);
+        reveal("pair-credit", 4.85);
+        reveal("pair-note", 5.55);
+      } else if (sceneIndex === 2) {
+        const scene = scenes[sceneIndex];
+        scene.classList.toggle("show-hours", time >= .85);
+        scene.classList.toggle("show-stress", time >= 3.55);
+        frame.push(time >= .85, time >= 3.55);
+        reveal("coverage-card", .8);
+        reveal("citation-card", 2);
+        reveal("partial", 3.55);
+        reveal("citation-total", 5.15);
+        reveal("evidence-note", 5.45);
+      } else {
+        reveal("combine-pairwise", .2);
+        reveal("combine-evidence", .65);
+        reveal("merge-score", 1.65);
+        reveal("system-rank", 3.25);
+        reveal("rank-note", 4.75);
+      }
+      return frame.join(",");
+    };
+
+    window.renderApproach(4, true);
+  </script>
+</body>
+</html>
