@@ -9,6 +9,6 @@ From this directory, run the following with Quarto 1.9.
 
     quarto render talk.qmd
 
-Open the resulting HTML in a browser. Click **Edit slides**, choose a slide, and edit its text, table cells, chart values, or speaker notes. **Download HTML** saves the whole deck as a standalone, editable HTML file. Changes live in the current browser tab until you download a copy. Edit the Quarto source to change the slide order or layouts.
+Open `talk.html` in a browser. Click **Edit slides**, choose a slide, and edit its text, table cells, chart values, or speaker notes. **Download HTML** saves the whole deck as a standalone, editable HTML file. Changes live in the current browser tab until you download a copy. Edit the Quarto source to change the slide order or layouts.
 
-Use the arrow keys to present and S for speaker notes. Click the theme button to cycle through Auto, Dark, Light, and Storybook. On narrow screens the slides appear as a scrolling reader. To export a PDF, open the HTML with ?print-pdf appended to its URL and print from Chromium with background graphics enabled.
+Use the arrow keys to present and S for speaker notes. Click the theme button to cycle through Auto, Dark, Light, and Storybook. On narrow screens the slides appear as a scrolling reader.
