@@ -4,18 +4,16 @@ TREC AutoJudge measures how closely automated judges reproduce the official
 rankings of answer systems. We submitted three approaches built with
 GPT-6 Luna to both the RAG and RAGTIME tracks, for six confirmed TIRA submissions.
 
-## Start here
+## [Project site](https://npatta01.github.io/trec-auto-judge-2026/)
 
-- [Editable HTML talk](docs/paper/slides/talk.html) — follow one example from
-  pairwise votes through citation checks and the organizer results. Download
-  `talk.html` and open it in a browser. Use **Edit slides** and **Download HTML**
-  to save your edits.
-- [Notebook paper](docs/paper/autojudge2026.pdf) — the judging protocol, scoring
-  formulas, and submitted run IDs.
-- [Architecture walkthrough](docs/submission-architecture.html) — an interactive
-  view of the three approaches, with illustrative submission metadata.
-- [Project landing page](index.html) — open `index.html` from a checkout to
-  watch the approach video, compare track results, or jump to a detailed slide.
+[![Approach walkthrough showing cited answers, Pairwise and Evidence scores, and their combination.](docs/assets/autojudge-approach-poster.jpg)](https://npatta01.github.io/trec-auto-judge-2026/#architecture)
+
+**[Watch the approach](https://npatta01.github.io/trec-auto-judge-2026/#architecture)** · 34 seconds · [MP4](https://npatta01.github.io/trec-auto-judge-2026/docs/assets/autojudge-approach.mp4)
+
+- [Slides](https://npatta01.github.io/trec-auto-judge-2026/docs/paper/slides/talk.html) — follow the worked example and organizer results. Use **Edit slides** and **Download HTML** to save an editable offline copy.
+- [Notebook paper](https://npatta01.github.io/trec-auto-judge-2026/docs/paper/autojudge2026.pdf) — judging protocol, scoring formulas, and submitted run IDs.
+- [Architecture walkthrough](https://npatta01.github.io/trec-auto-judge-2026/docs/submission-architecture.html) — interactive scoring branches with illustrative submission metadata.
+- [Results](https://npatta01.github.io/trec-auto-judge-2026/#results) and [Deep dive](https://npatta01.github.io/trec-auto-judge-2026/#deep-dive) — the track scores, rating fit, and worked answer grades.
 
 ## How the judges work
 
