@@ -1,5 +1,24 @@
 /* Synthetic adapter. Does not load judging data, contact TIRA, or upload files. */
 (() => {
+  if (new URLSearchParams(location.search).get('embed') === '1') {
+    const root = document.documentElement;
+    root.classList.add('embedded');
+
+    const prefersDark = matchMedia('(prefers-color-scheme: dark)');
+    const syncTheme = () => { root.dataset.theme = prefersDark.matches ? 'dark' : 'light'; };
+    syncTheme();
+    prefersDark.addEventListener('change', syncTheme);
+
+    const frame = window.frameElement;
+    if (frame && typeof ResizeObserver === 'function') {
+      const hub = document.getElementById('hub');
+      // Measure the content, so the frame can shrink when a panel is closed.
+      new ResizeObserver(() => {
+        frame.style.height = Math.ceil(hub.getBoundingClientRect().height) + 'px';
+      }).observe(hub);
+    }
+  }
+
   document.getElementById('theme').addEventListener('change', event => {
     document.documentElement.dataset.theme = event.target.value;
   });

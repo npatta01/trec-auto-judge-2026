@@ -43,4 +43,7 @@ summary { cursor:pointer; min-height:32px; font-size:14px; font-weight:550; }
 .demo-package h2 { margin:0; font-size:22px; }
 footer { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; margin-top:32px; padding-top:20px; border-top:1px solid var(--comparison-line); font-size:14px; }
 @media(max-width:650px) { #hub { padding:16px 20px 32px; } h1 { font-size:28px; margin-top:28px; } }
+:root.embedded #hub { max-width:none; padding:clamp(14px,2.5vw,28px); }
+:root.embedded #hub > :is(.app-toolbar, h1, .subtitle, footer) { display:none; }
+:root.embedded #demo-notice { margin:0; }
 @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }
