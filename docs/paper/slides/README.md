@@ -1,5 +1,9 @@
 # TREC AutoJudge 2026 talk
 
+[HTML deck](talk.html) · [PDF slides (30 pages)](talk.pdf)
+
+The PDF includes the complete talk and appendix, with one presentation-layout slide per page and selectable text.
+
 This deck follows the notebook paper’s illustrative four-day-workweek answer through Pairwise, Evidence, and Combined. The main slides show the pairwise judgment counts and how Bradley–Terry turns votes into scores, the shared checklist, coverage and citation judgments, a worked grade, our headline organizer results, and a two-system example of how citation checks change a ranking. The appendix contains the comparison schedule, the detailed example and Bradley–Terry fit, the host-track metrics and citation-order example, the segment-level grounding example, the score formulas, and the organizer’s rank-agreement scores for all 17 reported measures. The workweek answers, judgments, and scores are illustrative. The November 13, 2026 organizer package covers NP Labs runs and identifies our RAGTIME run as top five overall. The layout and palette follow the [final TREC RAG talk](https://npatta01.github.io/trec_rag_2026/reports/2026-trec-rag-talk.html). The illustrations in `art/` were generated for the AutoJudge deck.
 
 - [Submitted notebook paper](../autojudge2026.pdf), especially §§2–5 for the example.
